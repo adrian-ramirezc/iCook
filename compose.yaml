@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: 'postgres:16.1'
+    environment:
+      - 'POSTGRES_DB=icook_db'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=admin'
+    ports:
+      - '5432:5432'
+
+  pgadmin:
+    image: 'dpage/pgadmin4'
+    environment:
+      - 'PGADMIN_DEFAULT_EMAIL=admin@icook.com'
+      - 'PGADMIN_DEFAULT_PASSWORD=admin'
+    ports:
+      - '8888:80'
