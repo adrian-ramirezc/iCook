@@ -1,4 +1,2 @@
 .venv
-data/__pycache__
-data/models/__pycache__
-data/repositories/__pycache__
+__pycache__
