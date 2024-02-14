@@ -59,7 +59,7 @@ class ICookViewModel(
         _signUpState.update{ state ->
             state.copy(
                 user = state.user.copy(
-                    password = newPassword
+                    password = realNewPassword
                 ),
                 isPasswordError = false,
             )

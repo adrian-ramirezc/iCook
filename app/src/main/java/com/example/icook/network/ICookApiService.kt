@@ -8,8 +8,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 
-//private const val BASE_URL = "http://192.168.27.168:8080"
-private const val BASE_URL = "http://10.0.2.2:5000"
+private const val BASE_URL = "http://192.168.27.168:5000"
+//private const val BASE_URL = "http://10.0.2.2:5000"
 /**
  * when debugging/testing:
  *  - from emulator: "http://10.0.2.2:PORT_NUMBER"
