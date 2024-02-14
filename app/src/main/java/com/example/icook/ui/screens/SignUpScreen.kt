@@ -53,28 +53,28 @@ fun SignUpScreen(
         )
         SignUpField(
             imageVector = Icons.Outlined.Create,
-            value = signUpState.username,
+            value = signUpState.user.username,
             onValueChange = onUsernameChange,
             labelText = "Username",
             isError = signUpState.isUsernameError,
         )
         SignUpField(
             imageVector = Icons.Outlined.AccountBox,
-            value = signUpState.name,
+            value = signUpState.user.name,
             onValueChange = onNameChange,
             labelText = "Name",
             isError = signUpState.isNameError
         )
         SignUpField(
             imageVector = Icons.Outlined.AccountBox,
-            value = signUpState.lastName,
+            value = signUpState.user.lastname,
             onValueChange = onLastNameChange,
             labelText = "Last Name",
             isError = signUpState.isLastNameError
         )
         SignUpField(
             imageVector = Icons.Outlined.Lock,
-            value = signUpState.password,
+            value = signUpState.user.password,
             onShowHideValueChange = onPasswordChange,
             labelText = "Password",
             showHideValue = true,

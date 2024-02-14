@@ -1,7 +1,6 @@
 package com.example.icook.ui
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,7 +17,6 @@ import com.example.icook.ui.screens.CreatePostScreen
 import com.example.icook.ui.screens.HomeScreen
 import com.example.icook.ui.screens.ProfileScreen
 import com.example.icook.ui.screens.SignUpScreen
-import kotlinx.coroutines.runBlocking
 
 enum class ICookScreen{
     SignUp,
@@ -54,8 +52,7 @@ fun ICookApp(
                     onPasswordChange = {currentPassword, newValue -> viewModel.onPasswordChange(currentPassword,newValue)},
                     onSignUpButtonClicked = {
                         if (viewModel.isValidSignUp()) {
-                                val response = viewModel.getVerses()
-                                Log.d("ICookApp", response.toString())
+                            viewModel.signUpUser()
                             switchTo(navController, ICookScreen.Home)
                         }
                     }

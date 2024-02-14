@@ -1,12 +1,10 @@
 package com.example.icook.data
 
-class User(
-    val username: String = "aramirez",
-    val name: String = "Adrian",
-    val lastName: String = "Ramirez",
-    val description: String = "Hello, I am new to iCook!",
-    val picture: String = "default",
+data class User(
+    val username: String = "",
+    val name: String = "",
+    val lastname: String = "",
+    val description: String = "",
+    val picture: String = "",
     val password: String = "",
-) {
-
-}
+)

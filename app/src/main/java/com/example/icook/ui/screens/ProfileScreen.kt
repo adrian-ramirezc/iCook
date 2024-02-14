@@ -85,7 +85,7 @@ fun ProfileScreen(
             }
         }
         Text(
-            text = "${user.name} ${user.lastName}",
+            text = "${user.name} ${user.lastname}",
             modifier = Modifier.padding(start = 15.dp)
             )
         Row(

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import java.io.IOException
 
 const val TAG = "ICookViewModel"
@@ -25,25 +24,30 @@ class ICookViewModel(
     val uiState: StateFlow<ICookUiState> = _uiState.asStateFlow()
 
     fun onUsernameChange(newUsername: String) {
-        _signUpState.update{
-            it.copy(
-                username = newUsername,
+        _signUpState.update{state ->
+            state.copy(
+                user = state.user.copy(
+                    username = newUsername
+                ),
                 isUsernameError = false,
             )
         }
     }
     fun onNameChange(newName: String) {
-        _signUpState.update{
-            it.copy(
-                name = newName,
-                isNameError = false,
+        _signUpState.update{ state ->
+            state.copy(
+                user = state.user.copy(
+                    name = newName
+                ),    isNameError = false,
             )
         }
     }
     fun onLastNameChange(newLastname: String) {
-        _signUpState.update{
-            it.copy(
-                lastName = newLastname,
+        _signUpState.update{ state ->
+            state.copy(
+                user = state.user.copy(
+                    lastname = newLastname
+                ),
                 isLastNameError = false,
             )
         }
@@ -52,9 +56,11 @@ class ICookViewModel(
         val justAdded = newPassword.substring(currentPassword.length)
         val realNewPassword: String = currentPassword + justAdded
 
-        _signUpState.update{
-            it.copy(
-                password = realNewPassword,
+        _signUpState.update{ state ->
+            state.copy(
+                user = state.user.copy(
+                    password = newPassword
+                ),
                 isPasswordError = false,
             )
         }
@@ -69,19 +75,19 @@ class ICookViewModel(
     }
 
     private fun isUsernameInvalid(): Boolean {
-        return signUpState.value.username.isBlank() or (signUpState.value.username.length < 8)
+        return signUpState.value.user.username.isBlank() or (signUpState.value.user.username.length < 8)
     }
 
     private fun isNameInvalid(): Boolean {
-        return signUpState.value.name.isBlank()
+        return signUpState.value.user.name.isBlank()
     }
 
     private fun isLastNameInvalid(): Boolean {
-        return signUpState.value.lastName.isBlank()
+        return signUpState.value.user.lastname.isBlank()
     }
 
     private fun isPasswordInvalid(): Boolean {
-        return signUpState.value.password.isBlank() or (signUpState.value.password.length < 8)
+        return signUpState.value.user.password.isBlank() or (signUpState.value.user.password.length < 8)
     }
 
     fun isValidSignUp(): Boolean {
@@ -127,14 +133,13 @@ class ICookViewModel(
 
     }
 
-    fun getVerses() {
+    fun signUpUser() {
         viewModelScope.launch {
             try {
-                val listResult = ICookApi.retrofitService.getVerses()
-
+                ICookApi.retrofitService.signUpUser(signUpState.value.user)
                 _uiState.update {
                     it.copy(
-                        verses = "Success: ${listResult.length} Mars photos retrieved"
+                        isUserLoggedIn = true
                     )
                 }
             } catch (e: IOException) {
