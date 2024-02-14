@@ -3,11 +3,11 @@ from flask_restx import Api, Resource, fields, reqparse
 
 from data.database import db_session, init_db
 from data.models.user import User
-from data.repositories.users import UserRepository
-from data.services.sign_up import SignUpService
+from data.repositories.user_repository import UserRepository
+from data.services.user_service import UserService
 
 app = Flask(__name__)
-api = Api(app)
+api = Api(app, title="iCook")
 
 init_db()
 
@@ -23,24 +23,23 @@ user_model = api.model(
     },
 )
 
+user_repository = UserRepository(db_session=db_session)
+user_service = UserService(user_repository=user_repository)
+
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
 
 
-sign_up_service = SignUpService(user_repository=UserRepository)
-
-
 @api.route("/signup")
-class HelloWorld(Resource):
-
+class SignUp(Resource):
     @api.expect(user_model)
     def post(self):
         user_dict = api.payload
-        sign_up_service.add(user_dict=user_dict)
+        user_service.add(user_dict=user_dict)
         return
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

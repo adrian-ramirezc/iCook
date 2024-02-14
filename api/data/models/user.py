@@ -31,7 +31,7 @@ class User(Base):
         self.picture = picture
 
     def __repr__(self):
-        return f"<User {self.username!r}>"
+        return f"User(username={self.username})"
 
     def from_dict(user_dict: dict):
         return User(**user_dict)

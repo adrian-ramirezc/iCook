@@ -1,8 +1,8 @@
 from data.models.user import User
-from data.repositories.users import UserRepository
+from data.repositories.user_repository import UserRepository
 
 
-class SignUpService:
+class UserService:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
