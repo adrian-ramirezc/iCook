@@ -3,20 +3,37 @@ package com.example.icook.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.icook.ICookUiState
-import com.example.icook.data.SignUpState
+import androidx.navigation.NavHostController
+import com.example.icook.data.models.SimpleMessage
+import com.example.icook.data.models.User
 import com.example.icook.network.ICookApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 const val TAG = "ICookViewModel"
 
-class ICookViewModel(
-) : ViewModel() {
+data class ICookUiState(
+    val user : User = User(),
+    val isUserLoggedIn : Boolean = false
+)
+data class SignUpState(
+    val user: User = User(),
+    val isUsernameError: Boolean = false,
+    val isNameError: Boolean = false,
+    val isLastNameError: Boolean = false,
+    val isPasswordError: Boolean = false,
+    val isPasswordVisible: Boolean = false,
+    val isValidating: Boolean = false,
+)
+
+
+class ICookViewModel : ViewModel() {
     private val _signUpState = MutableStateFlow(SignUpState())
     val signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
 
@@ -90,8 +107,16 @@ class ICookViewModel(
         return signUpState.value.user.password.isBlank() or (signUpState.value.user.password.length < 8)
     }
 
-    fun isValidSignUp(): Boolean {
-        var isValid: Boolean = true
+    private fun setIsValidating(value: Boolean) {
+        _signUpState.update {
+            it.copy(
+                isValidating = value
+            )
+        }
+    }
+
+    private fun isValidSignUpForm(): Boolean {
+        var isValid = true
         if (isUsernameInvalid()) {
             isValid = false
             _signUpState.update {
@@ -133,21 +158,46 @@ class ICookViewModel(
 
     }
 
-    fun signUpUser() {
-        viewModelScope.launch {
-            try {
-                ICookApi.retrofitService.signUpUser(signUpState.value.user)
-                _uiState.update {
-                    it.copy(
-                        isUserLoggedIn = true
-                    )
-                }
-            } catch (e: IOException) {
-                val error = e.message
-                Log.d("View Model", "error")
+    fun onSignUpButtonClicked(navController: NavHostController) {
+        setIsValidating(value = true)
+        validateAndCreateNewUser(navController=navController)
+    }
+
+    private fun validateAndCreateNewUser(navController: NavHostController) {
+        if (isValidSignUpForm()) {
+            viewModelScope.launch(Dispatchers.Main) {
+                userExists(user = signUpState.value.user, navController)
             }
+        } else {
+            Log.d(TAG, "Sign Up Form is not valid")
+            setIsValidating(value = false)
         }
     }
 
+    private suspend fun userExists(user: User, navController: NavHostController) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val getUserResponse = getUser(username = user.username)
+            setIsValidating(value = false)
+            if (getUserResponse.isSuccessful) {
+                Log.d(TAG, "Username already exists" )
+            } else {
+                Log.d(TAG, "Username is available")
+                val createResponse = createUser(user = signUpState.value.user)
+                if (createResponse.isSuccessful) {
+                    switchToHome(navController)
+                } else {
+                    Log.e(TAG, "User was not created: ${createResponse.body()}")
+                }
+            }
 
+        }
+    }
+
+    private suspend fun getUser(username : String): Response<User?> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.getUser(username)
+    }
+
+    private suspend fun createUser(user : User): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.createUser(user)
+    }
 }

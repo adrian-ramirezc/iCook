@@ -1,4 +1,4 @@
-package com.example.icook.data
+package com.example.icook.data.models
 
 data class User(
     val username: String = "",

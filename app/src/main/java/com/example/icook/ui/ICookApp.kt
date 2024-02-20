@@ -50,17 +50,12 @@ fun ICookApp(
                     onLastNameChange = {newLastName -> viewModel.onLastNameChange(newLastName)},
                     onShowHidePasswordButtonClicked = {viewModel.onShowHidePasswordButtonClicked()},
                     onPasswordChange = {currentPassword, newValue -> viewModel.onPasswordChange(currentPassword,newValue)},
-                    onSignUpButtonClicked = {
-                        if (viewModel.isValidSignUp()) {
-                            viewModel.signUpUser()
-                            switchTo(navController, ICookScreen.Home)
-                        }
-                    }
+                    onSignUpButtonClicked = {viewModel.onSignUpButtonClicked(navController)}
                 )
             }
             composable(route = ICookScreen.Home.name){
                 HomeScreen(
-                    user = uiState.user,
+                    user = signUpState.user,
                     onProfileButtonClicked = { switchTo(navController, ICookScreen.Profile)},
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost) }
                 )
@@ -88,4 +83,9 @@ fun switchTo(navController: NavHostController, screen: ICookScreen) {
     if (navController.currentBackStack.value[1].destination.route != screen.name) {
         navController.navigate(screen.name)
     }
+}
+
+@SuppressLint("RestrictedApi")
+fun switchToHome(navController: NavHostController) {
+    switchTo(navController, ICookScreen.Home)
 }

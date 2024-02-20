@@ -1,5 +1,6 @@
 package com.example.icook.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,16 +11,18 @@ import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.icook.data.SignUpState
+import com.example.icook.ui.SignUpState
 import com.example.icook.ui.components.SignUpField
 
 @Composable
@@ -32,7 +35,6 @@ fun SignUpScreen(
     onPasswordChange: (String, String) -> Unit = {currentPassword: String, newValue: String -> },
     onShowHidePasswordButtonClicked: () -> Unit = {},
 ) {
-
     Column(
         modifier = Modifier.padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,8 +102,17 @@ fun SignUpScreen(
                 Text(text = "Login")
             }
         }
-        
-        
+    }
+    if (signUpState.isValidating) {
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+                .background(Color.Black.copy(alpha = 0.6f)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
 
@@ -109,5 +120,5 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview(){
-    SignUpScreen()
+    SignUpScreen(signUpState = SignUpState(isValidating = true))
 }

@@ -1,15 +1,18 @@
 package com.example.icook.network
 
-import com.example.icook.data.User
+import com.example.icook.data.models.SimpleMessage
+import com.example.icook.data.models.User
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
-private const val BASE_URL = "http://192.168.27.168:5000"
-//private const val BASE_URL = "http://10.0.2.2:5000"
+//private const val BASE_URL = "http://192.168.27.168:5000"
+private const val BASE_URL = "http://10.0.2.2:5000"
 /**
  * when debugging/testing:
  *  - from emulator: "http://10.0.2.2:PORT_NUMBER"
@@ -17,19 +20,20 @@ private const val BASE_URL = "http://192.168.27.168:5000"
  *      Tip: Turn on mobile hotspot and connect computer to that network
  *      In computer: $ ifconfig
  *      And look for you public address, usually: 192.168.XX.XX
+ *      Make backend host: 0.0.0.0
  * **/
-
 
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .baseUrl(BASE_URL)
     .build()
 
-
-
 interface ICookApiService {
-    @POST("signup")
-    suspend fun signUpUser(@Body requestBody: User): String
+    @POST("users/create")
+    suspend fun createUser(@Body requestBody: User): Response<SimpleMessage>
+
+    @GET("users/{username}")
+    suspend fun getUser(@Path("username") username: String): Response<User?>
 }
 
 
