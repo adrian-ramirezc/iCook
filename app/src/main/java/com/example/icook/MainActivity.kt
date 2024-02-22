@@ -13,7 +13,6 @@ import com.example.icook.ui.theme.ICookTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             ICookTheme {

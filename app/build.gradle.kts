@@ -67,6 +67,11 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     // Gson
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // Hashing function
+    implementation("org.mindrot:jbcrypt:0.4")
+    // Load image from Uri
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

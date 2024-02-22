@@ -3,17 +3,14 @@ package com.example.icook.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,30 +26,27 @@ import com.example.icook.ui.components.CircularProgress
 import com.example.icook.ui.components.SignUpField
 
 @Composable
-fun SignUpScreen(
-    onSignUpButtonClicked: () -> Unit = {},
+fun LogInScreen(
+    onLogInButtonClicked: () -> Unit = {},
     user: User = User(),
-    signUpState: FormState = FormState(),
+    logInState: FormState = FormState(),
     onUsernameChange: (String) -> Unit = {},
-    onNameChange: (String) -> Unit = {},
-    onLastNameChange: (String) -> Unit = {},
     onPasswordChange: (String, String) -> Unit = {currentPassword: String, newValue: String -> },
     onShowHidePasswordButtonClicked: () -> Unit = {},
-    onLogInTextButtonClicked: () -> Unit = {},
 ) {
     Column(
-        modifier = if (signUpState.isValidating) Modifier.padding(10.dp).blur(5.dp) else Modifier.padding(10.dp),
+        modifier = if (logInState.isValidating) Modifier.padding(10.dp).blur(5.dp) else Modifier.padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Sign up",
+            text = "Log In",
             textAlign = TextAlign.Center,
             fontSize = 40.sp,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
-            text = "Create your iCook account",
+            text = "Check out the new trends",
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -63,21 +57,7 @@ fun SignUpScreen(
             value = user.username.trim(),
             onValueChange = onUsernameChange,
             labelText = "Username",
-            isError = signUpState.isUsernameError,
-        )
-        SignUpField(
-            imageVector = Icons.Outlined.AccountBox,
-            value = user.name.trim(),
-            onValueChange = onNameChange,
-            labelText = "Name",
-            isError = signUpState.isNameError
-        )
-        SignUpField(
-            imageVector = Icons.Outlined.AccountBox,
-            value = user.lastname.trim(),
-            onValueChange = onLastNameChange,
-            labelText = "Last Name",
-            isError = signUpState.isLastNameError
+            isError = logInState.isUsernameError,
         )
         SignUpField(
             imageVector = Icons.Outlined.Lock,
@@ -85,32 +65,20 @@ fun SignUpScreen(
             onShowHideValueChange = onPasswordChange,
             labelText = "Password",
             showHideValue = true,
-            isTextVisible = signUpState.isPasswordVisible,
+            isTextVisible = logInState.isPasswordVisible,
             onShowHideButtonClicked = onShowHidePasswordButtonClicked,
-            isError = signUpState.isPasswordError,
+            isError = logInState.isPasswordError,
         )
         Button(
-            onClick = onSignUpButtonClicked,
+            onClick = onLogInButtonClicked,
             modifier = Modifier.padding(15.dp)
         ) {
             Text(
-                text = "Sign Up"
+                text = "Log In"
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Already have an account?")
-            TextButton(
-                onClick = onLogInTextButtonClicked
-            ) {
-                Text(text = "Login")
-            }
-        }
     }
-    if (signUpState.isValidating) {
+    if (logInState.isValidating) {
         CircularProgress()
     }
 }
@@ -118,6 +86,6 @@ fun SignUpScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun SignUpScreenPreview(){
-    SignUpScreen(signUpState = FormState(isValidating = true))
+fun LogInScreenPreview(){
+    LogInScreen(logInState = FormState(isValidating = true))
 }

@@ -7,6 +7,8 @@ import androidx.navigation.NavHostController
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
 import com.example.icook.network.ICookApi
+import com.example.icook.utils.hashPassword
+import com.example.icook.utils.verifyPassword
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,14 +18,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 
+
 const val TAG = "ICookViewModel"
 
-data class ICookUiState(
-    val user : User = User(),
-    val isUserLoggedIn : Boolean = false
-)
-data class SignUpState(
-    val user: User = User(),
+data class FormState(
     val isUsernameError: Boolean = false,
     val isNameError: Boolean = false,
     val isLastNameError: Boolean = false,
@@ -32,83 +30,99 @@ data class SignUpState(
     val isValidating: Boolean = false,
 )
 
-
 class ICookViewModel : ViewModel() {
-    private val _signUpState = MutableStateFlow(SignUpState())
-    val signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
+    private val _userState = MutableStateFlow(User())
+    val userState: StateFlow<User> = _userState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(ICookUiState())
-    val uiState: StateFlow<ICookUiState> = _uiState.asStateFlow()
+    private val _formState = MutableStateFlow(FormState())
+    val formState: StateFlow<FormState> = _formState.asStateFlow()
 
     fun onUsernameChange(newUsername: String) {
-        _signUpState.update{state ->
-            state.copy(
-                user = state.user.copy(
-                    username = newUsername
-                ),
+        _userState.update {
+            it.copy(
+            username = newUsername
+        )
+        }
+        _formState.update{
+            it.copy(
                 isUsernameError = false,
             )
         }
     }
     fun onNameChange(newName: String) {
-        _signUpState.update{ state ->
+        _userState.update {
+            it.copy(
+                name = newName
+            )
+        }
+        _formState.update{ state ->
             state.copy(
-                user = state.user.copy(
-                    name = newName
-                ),    isNameError = false,
+               isNameError = false,
             )
         }
     }
     fun onLastNameChange(newLastname: String) {
-        _signUpState.update{ state ->
+        _userState.update {
+            it.copy(
+                lastname = newLastname
+            )
+        }
+        _formState.update{ state ->
             state.copy(
-                user = state.user.copy(
-                    lastname = newLastname
-                ),
                 isLastNameError = false,
             )
         }
     }
     fun onPasswordChange(currentPassword: String, newPassword: String) {
-        val justAdded = newPassword.substring(currentPassword.length)
-        val realNewPassword: String = currentPassword + justAdded
+        var realNewPassword: String = ""
+        if (newPassword.length < currentPassword.length) {
+            realNewPassword = currentPassword.substring(
+                startIndex = 0,
+                endIndex = newPassword.length
+            )
+        } else {
+            val justAdded = newPassword.substring(currentPassword.length)
+            realNewPassword = currentPassword + justAdded
 
-        _signUpState.update{ state ->
+        }
+        _userState.update {
+            it.copy(
+                password = realNewPassword
+            )
+        }
+        _formState.update{ state ->
             state.copy(
-                user = state.user.copy(
-                    password = realNewPassword
-                ),
                 isPasswordError = false,
             )
         }
     }
 
     fun onShowHidePasswordButtonClicked() {
-        _signUpState.update {
+        _formState.update {
             it.copy(
-                isPasswordVisible = !signUpState.value.isPasswordVisible
+                isPasswordVisible = !formState.value.isPasswordVisible
             )
         }
     }
 
     private fun isUsernameInvalid(): Boolean {
-        return signUpState.value.user.username.isBlank() or (signUpState.value.user.username.length < 8)
+        return userState.value.username.isBlank() or (userState.value.username.length < 8)
     }
 
     private fun isNameInvalid(): Boolean {
-        return signUpState.value.user.name.isBlank()
+        return userState.value.name.isBlank()
     }
 
     private fun isLastNameInvalid(): Boolean {
-        return signUpState.value.user.lastname.isBlank()
+        return userState.value.lastname.isBlank()
     }
 
     private fun isPasswordInvalid(): Boolean {
-        return signUpState.value.user.password.isBlank() or (signUpState.value.user.password.length < 8)
+        return userState.value.password.isBlank() or (userState.value.password.length < 3)
     }
 
     private fun setIsValidating(value: Boolean) {
-        _signUpState.update {
+        _formState.update {
             it.copy(
                 isValidating = value
             )
@@ -119,7 +133,7 @@ class ICookViewModel : ViewModel() {
         var isValid = true
         if (isUsernameInvalid()) {
             isValid = false
-            _signUpState.update {
+            _formState.update {
                 it.copy(
                     isUsernameError = true
                 )
@@ -127,7 +141,7 @@ class ICookViewModel : ViewModel() {
         }
         if (isNameInvalid()) {
             isValid = false
-            _signUpState.update {
+            _formState.update {
                 it.copy(
                     isNameError = true
                 )
@@ -135,7 +149,7 @@ class ICookViewModel : ViewModel() {
         }
         if (isLastNameInvalid()) {
             isValid = false
-            _signUpState.update {
+            _formState.update {
                 it.copy(
                     isLastNameError = true
                 )
@@ -143,7 +157,7 @@ class ICookViewModel : ViewModel() {
         }
         if (isPasswordInvalid()) {
             isValid = false
-            _signUpState.update {
+            _formState.update {
                 it.copy(
                     isPasswordError = true
                 )
@@ -155,49 +169,96 @@ class ICookViewModel : ViewModel() {
         }
         Log.d(TAG, "Sign up invalid!")
         return false
+    }
 
+    private fun isValidLogInForm(): Boolean {
+        var isValid = true
+        if (isUsernameInvalid()) {
+            isValid = false
+            _formState.update {
+                it.copy(
+                    isUsernameError = true
+                )
+            }
+        }
+        if (isPasswordInvalid()) {
+            isValid = false
+            _formState.update {
+                it.copy(
+                    isPasswordError = true
+                )
+            }
+        }
+        if (isValid) {
+            Log.d(TAG, "Sign up is valid!")
+            return true
+        }
+        Log.d(TAG, "Sign up invalid!")
+        return false
     }
 
     fun onSignUpButtonClicked(navController: NavHostController) {
         setIsValidating(value = true)
-        validateAndCreateNewUser(navController=navController)
-    }
-
-    private fun validateAndCreateNewUser(navController: NavHostController) {
-        if (isValidSignUpForm()) {
-            viewModelScope.launch(Dispatchers.Main) {
-                userExists(user = signUpState.value.user, navController)
-            }
-        } else {
+        if (!isValidSignUpForm()) {
             Log.d(TAG, "Sign Up Form is not valid")
             setIsValidating(value = false)
+        } else {
+            tryCreateUser(user = userState.value, navController=navController)
         }
     }
 
-    private suspend fun userExists(user: User, navController: NavHostController) {
-        viewModelScope.launch(Dispatchers.Main) {
-            val getUserResponse = getUser(username = user.username)
+    fun onLogInButtonClicked(navController: NavHostController) {
+        setIsValidating(value = true)
+        if (!isValidLogInForm()) {
+            Log.d(TAG, "Log In Form is not valid")
             setIsValidating(value = false)
-            if (getUserResponse.isSuccessful) {
+        } else {
+            tryLogInUser(user = userState.value, navController = navController)
+        }
+    }
+
+    private fun tryLogInUser(user: User, navController: NavHostController) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val userResponse = getUser(username = user.username)
+            setIsValidating(value = false)
+            if (userResponse.code() == 200) {
+                Log.d(TAG, "User found")
+                if (verifyPassword(user.password, userResponse.body()!!.password)) {
+                    switchToHome(navController)
+                } else {
+                    Log.d(TAG, "Incorrect Password")
+                }
+            } else {
+                Log.d(TAG, "User not found")
+            }
+        }
+    }
+
+    private fun tryCreateUser(user: User, navController: NavHostController) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val userResponse = getUser(username = user.username)
+            setIsValidating(value = false)
+            if (userResponse.isSuccessful) {
                 Log.d(TAG, "Username already exists" )
             } else {
                 Log.d(TAG, "Username is available")
-                val createResponse = createUser(user = signUpState.value.user)
+                val createResponse = createUser(user = userState.value)
                 if (createResponse.isSuccessful) {
                     switchToHome(navController)
                 } else {
-                    Log.e(TAG, "User was not created: ${createResponse.body()}")
+                    Log.e(TAG, "User was not created: $createResponse")
                 }
             }
 
         }
     }
 
-    private suspend fun getUser(username : String): Response<User?> = withContext(Dispatchers.IO) {
+    private suspend fun getUser(username : String): Response<User> = withContext(Dispatchers.IO) {
         return@withContext ICookApi.retrofitService.getUser(username)
     }
 
     private suspend fun createUser(user : User): Response<SimpleMessage> = withContext(Dispatchers.IO) {
-        return@withContext ICookApi.retrofitService.createUser(user)
+        val hashedUser = user.copy(password = hashPassword(user.password))
+        return@withContext ICookApi.retrofitService.createUser(hashedUser)
     }
 }

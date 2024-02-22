@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.R
-import com.example.icook.data.Post
-import com.example.icook.data.User
+import com.example.icook.data.models.Post
+import com.example.icook.data.models.User
 import com.example.icook.ui.components.BottomNavigationBar
 
 @Composable

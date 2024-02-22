@@ -15,11 +15,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.icook.ui.screens.CreatePostScreen
 import com.example.icook.ui.screens.HomeScreen
+import com.example.icook.ui.screens.LogInScreen
 import com.example.icook.ui.screens.ProfileScreen
 import com.example.icook.ui.screens.SignUpScreen
 
 enum class ICookScreen{
     SignUp,
+    LogIn,
     Home,
     CreatePost,
     Profile,
@@ -35,8 +37,9 @@ fun ICookApp(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        val uiState by viewModel.uiState.collectAsState()
-        val signUpState by viewModel.signUpState.collectAsState()
+        val userState by viewModel.userState.collectAsState()
+        val formState by viewModel.formState.collectAsState()
+
 
         NavHost(
             navController = navController,
@@ -44,18 +47,30 @@ fun ICookApp(
         ){
             composable(route = ICookScreen.SignUp.name){
                 SignUpScreen(
-                    signUpState = signUpState,
+                    user = userState,
+                    signUpState = formState,
                     onUsernameChange = { newUsername -> viewModel.onUsernameChange(newUsername) },
                     onNameChange = {newName -> viewModel.onNameChange(newName)},
                     onLastNameChange = {newLastName -> viewModel.onLastNameChange(newLastName)},
                     onShowHidePasswordButtonClicked = {viewModel.onShowHidePasswordButtonClicked()},
                     onPasswordChange = {currentPassword, newValue -> viewModel.onPasswordChange(currentPassword,newValue)},
-                    onSignUpButtonClicked = {viewModel.onSignUpButtonClicked(navController)}
+                    onSignUpButtonClicked = {viewModel.onSignUpButtonClicked(navController)},
+                    onLogInTextButtonClicked = { switchTo(navController, ICookScreen.LogIn)}
+                )
+            }
+            composable(route = ICookScreen.LogIn.name){
+                LogInScreen(
+                    user = userState,
+                    logInState = formState,
+                    onUsernameChange = { newUsername -> viewModel.onUsernameChange(newUsername) },
+                    onShowHidePasswordButtonClicked = {viewModel.onShowHidePasswordButtonClicked()},
+                    onPasswordChange = {currentPassword, newValue -> viewModel.onPasswordChange(currentPassword,newValue)},
+                    onLogInButtonClicked = {viewModel.onLogInButtonClicked(navController)},
                 )
             }
             composable(route = ICookScreen.Home.name){
                 HomeScreen(
-                    user = signUpState.user,
+                    user = userState,
                     onProfileButtonClicked = { switchTo(navController, ICookScreen.Profile)},
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost) }
                 )
