@@ -1,5 +1,6 @@
 package com.example.icook.network
 
+import com.example.icook.data.models.Post
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
 import retrofit2.Response
@@ -11,8 +12,8 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-//private const val BASE_URL = "http://192.168.27.168:5000"
-private const val BASE_URL = "http://10.0.2.2:5000"
+private const val BASE_URL = "http://192.168.27.168:5000"
+//private const val BASE_URL = "http://10.0.2.2:5000"
 /**
  * when debugging/testing:
  *  - from emulator: "http://10.0.2.2:PORT_NUMBER"
@@ -33,7 +34,10 @@ interface ICookApiService {
     suspend fun createUser(@Body requestBody: User): Response<SimpleMessage>
 
     @GET("users/{username}")
-    suspend fun getUser(@Path("username") username: String): Response<User?>
+    suspend fun getUser(@Path("username") username: String): Response<User>
+
+    @POST("posts/create")
+    suspend fun createPost(@Body requestBody: Post): Response<SimpleMessage>
 }
 
 

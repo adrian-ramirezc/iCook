@@ -1,13 +1,18 @@
 package com.example.icook.ui
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -32,14 +37,15 @@ fun ICookApp(
     viewModel: ICookViewModel = viewModel(),
     navController : NavHostController = rememberNavController()
 ) {
-    // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         val userState by viewModel.userState.collectAsState()
+        val newRawPostState by viewModel.newRawPostState.collectAsState()
         val formState by viewModel.formState.collectAsState()
-
+        val uiState by viewModel.uiState.collectAsState()
+        val contentResolver = LocalContext.current.contentResolver
 
         NavHost(
             navController = navController,
@@ -47,6 +53,7 @@ fun ICookApp(
         ){
             composable(route = ICookScreen.SignUp.name){
                 SignUpScreen(
+                    snackbarHostState = uiState.snackbarHostState,
                     user = userState,
                     signUpState = formState,
                     onUsernameChange = { newUsername -> viewModel.onUsernameChange(newUsername) },
@@ -60,6 +67,7 @@ fun ICookApp(
             }
             composable(route = ICookScreen.LogIn.name){
                 LogInScreen(
+                    snackbarHostState = uiState.snackbarHostState,
                     user = userState,
                     logInState = formState,
                     onUsernameChange = { newUsername -> viewModel.onUsernameChange(newUsername) },
@@ -77,6 +85,11 @@ fun ICookApp(
             }
             composable(route = ICookScreen.CreatePost.name) {
                 CreatePostScreen(
+                    snackbarHostState = uiState.snackbarHostState,
+                    newRawPostState = newRawPostState,
+                    onDescriptionChange = {newValue -> viewModel.onDescriptionChange(newValue)},
+                    updateNewRawPostUri = {uri: Uri? -> viewModel.updateNewRawPostUri(uri)},
+                    onCreateNewPostClicked = {viewModel.onCreateNewPostClicked(contentResolver = contentResolver, navController = navController)},
                     onHomeButtonClicked = { switchTo(navController, ICookScreen.Home) },
                     onProfileButtonClicked = { switchTo(navController, ICookScreen.Profile) }
                 )
@@ -103,4 +116,8 @@ fun switchTo(navController: NavHostController, screen: ICookScreen) {
 @SuppressLint("RestrictedApi")
 fun switchToHome(navController: NavHostController) {
     switchTo(navController, ICookScreen.Home)
+}
+
+fun switchToProfile(navController: NavHostController) {
+    switchTo(navController, ICookScreen.Profile)
 }

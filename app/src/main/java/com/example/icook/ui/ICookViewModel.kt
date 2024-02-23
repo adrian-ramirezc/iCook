@@ -1,13 +1,22 @@
 package com.example.icook.ui
 
+import android.content.ContentResolver
+import android.net.Uri
 import android.util.Log
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.example.icook.ICookState
+import com.example.icook.data.models.Post
+import com.example.icook.data.models.RawPost
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
 import com.example.icook.network.ICookApi
 import com.example.icook.utils.hashPassword
+import com.example.icook.utils.uriToBase64
 import com.example.icook.utils.verifyPassword
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,8 +40,14 @@ data class FormState(
 )
 
 class ICookViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(ICookState())
+    val uiState: StateFlow<ICookState> = _uiState.asStateFlow()
+
     private val _userState = MutableStateFlow(User())
     val userState: StateFlow<User> = _userState.asStateFlow()
+
+    private val _newRawPostState = MutableStateFlow(RawPost())
+    val newRawPostState: StateFlow<RawPost> = _newRawPostState.asStateFlow()
 
     private val _formState = MutableStateFlow(FormState())
     val formState: StateFlow<FormState> = _formState.asStateFlow()
@@ -121,7 +136,7 @@ class ICookViewModel : ViewModel() {
         return userState.value.password.isBlank() or (userState.value.password.length < 3)
     }
 
-    private fun setIsValidating(value: Boolean) {
+    private fun setIsValidatingForm(value: Boolean) {
         _formState.update {
             it.copy(
                 isValidating = value
@@ -198,20 +213,26 @@ class ICookViewModel : ViewModel() {
     }
 
     fun onSignUpButtonClicked(navController: NavHostController) {
-        setIsValidating(value = true)
+        setIsValidatingForm(value = true)
         if (!isValidSignUpForm()) {
+            viewModelScope.launch(Dispatchers.Main) {
+                showSnackbarMessage(message = "Invalid Form")
+            }
             Log.d(TAG, "Sign Up Form is not valid")
-            setIsValidating(value = false)
+            setIsValidatingForm(value = false)
         } else {
             tryCreateUser(user = userState.value, navController=navController)
         }
     }
 
     fun onLogInButtonClicked(navController: NavHostController) {
-        setIsValidating(value = true)
+        setIsValidatingForm(value = true)
         if (!isValidLogInForm()) {
+            viewModelScope.launch(Dispatchers.Main) {
+                showSnackbarMessage(message = "Invalid Form")
+            }
             Log.d(TAG, "Log In Form is not valid")
-            setIsValidating(value = false)
+            setIsValidatingForm(value = false)
         } else {
             tryLogInUser(user = userState.value, navController = navController)
         }
@@ -220,15 +241,17 @@ class ICookViewModel : ViewModel() {
     private fun tryLogInUser(user: User, navController: NavHostController) {
         viewModelScope.launch(Dispatchers.Main) {
             val userResponse = getUser(username = user.username)
-            setIsValidating(value = false)
+            setIsValidatingForm(value = false)
             if (userResponse.code() == 200) {
                 Log.d(TAG, "User found")
                 if (verifyPassword(user.password, userResponse.body()!!.password)) {
                     switchToHome(navController)
                 } else {
+                    showSnackbarMessage(message = "Wrong Password")
                     Log.d(TAG, "Incorrect Password")
                 }
             } else {
+                showSnackbarMessage(message = "User not found")
                 Log.d(TAG, "User not found")
             }
         }
@@ -237,7 +260,7 @@ class ICookViewModel : ViewModel() {
     private fun tryCreateUser(user: User, navController: NavHostController) {
         viewModelScope.launch(Dispatchers.Main) {
             val userResponse = getUser(username = user.username)
-            setIsValidating(value = false)
+            setIsValidatingForm(value = false)
             if (userResponse.isSuccessful) {
                 Log.d(TAG, "Username already exists" )
             } else {
@@ -261,4 +284,74 @@ class ICookViewModel : ViewModel() {
         val hashedUser = user.copy(password = hashPassword(user.password))
         return@withContext ICookApi.retrofitService.createUser(hashedUser)
     }
+
+    fun updateNewRawPostUri(newUri: Uri?){
+        if (newUri != null) {
+            _newRawPostState.update {
+                it.copy(
+                    uri = newUri
+                )
+            }
+        }
+    }
+
+    fun onDescriptionChange(newDescription: String) {
+        _newRawPostState.update {
+            it.copy(
+                description = newDescription
+            )
+        }
+    }
+
+    private fun setIsValidatingNewPost(value : Boolean) {
+        _newRawPostState.update {
+            it.copy(
+                isValidating = value
+            )
+        }
+    }
+
+    private suspend fun showSnackbarMessage(message: String){
+        uiState.value.snackbarHostState.showSnackbar(
+            message=message,
+            withDismissAction = true,
+            duration = SnackbarDuration.Short
+        )
+    }
+
+    fun onCreateNewPostClicked(contentResolver: ContentResolver, navController: NavHostController){
+        viewModelScope.launch {
+            if (newRawPostState.value.uri == Uri.parse("")) {
+                Log.d(TAG, "No picture was selected")
+                showSnackbarMessage(message = "No picture was selected")
+            } else if (newRawPostState.value.description.isBlank()) {
+                Log.d(TAG, "Post has no description")
+                showSnackbarMessage(message = "Post has no description")
+            } else {
+                val picture = uriToBase64(
+                    uri = newRawPostState.value.uri,
+                    contentResolver = contentResolver!!
+                )
+                var post = Post(
+                    username = userState.value.username,
+                    description = newRawPostState.value.description,
+                    picture = picture!!
+                )
+                setIsValidatingNewPost(value = true)
+                val response = createPost(post)
+                setIsValidatingNewPost(value = false)
+                if (response.isSuccessful) {
+                    Log.d(TAG, "Post created")
+                    switchToProfile(navController)
+                } else {
+                    showSnackbarMessage(message = "Post could not be created")
+                    Log.d(TAG, "Post could not be created")
+                }
+            }
+        }
+    }
+    private suspend fun createPost(post: Post): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.createPost(post)
+    }
+
 }

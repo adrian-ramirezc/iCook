@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,9 +28,11 @@ import com.example.icook.data.models.User
 import com.example.icook.ui.FormState
 import com.example.icook.ui.components.CircularProgress
 import com.example.icook.ui.components.SignUpField
+import com.example.icook.ui.components.Snackbar
 
 @Composable
 fun SignUpScreen(
+    snackbarHostState: SnackbarHostState = SnackbarHostState(),
     onSignUpButtonClicked: () -> Unit = {},
     user: User = User(),
     signUpState: FormState = FormState(),
@@ -113,6 +116,7 @@ fun SignUpScreen(
     if (signUpState.isValidating) {
         CircularProgress()
     }
+    Snackbar(hostState = snackbarHostState)
 }
 
 
