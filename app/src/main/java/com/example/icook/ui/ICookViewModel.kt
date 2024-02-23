@@ -14,6 +14,7 @@ import com.example.icook.data.models.Post
 import com.example.icook.data.models.RawPost
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
+import com.example.icook.data.models.UserToUpdate
 import com.example.icook.network.ICookApi
 import com.example.icook.utils.hashPassword
 import com.example.icook.utils.uriToBase64
@@ -245,6 +246,7 @@ class ICookViewModel : ViewModel() {
             if (userResponse.code() == 200) {
                 Log.d(TAG, "User found")
                 if (verifyPassword(user.password, userResponse.body()!!.password)) {
+                    _userState.update { userResponse.body()!!.copy(password = "") } // Do not expose user password
                     switchToHome(navController)
                 } else {
                     showSnackbarMessage(message = "Wrong Password")
@@ -352,6 +354,31 @@ class ICookViewModel : ViewModel() {
     }
     private suspend fun createPost(post: Post): Response<SimpleMessage> = withContext(Dispatchers.IO) {
         return@withContext ICookApi.retrofitService.createPost(post)
+    }
+
+    fun onDescriptionTextFieldClicked(newValue: String){
+        _userState.update {
+            it.copy(
+                description = newValue
+            )
+        }
+    }
+
+    fun persistNewUserDescription(){
+        viewModelScope.launch {
+            updateUser(username = userState.value.username, mapOf("description" to userState.value.description))
+        }
+    }
+
+    private suspend fun updateUser(username: String, keys: Map<String, String> = mapOf()): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        var userToUpdate = UserToUpdate(username=username)
+
+        for ((key, value) in keys) {
+            when (key) {
+                "description" -> userToUpdate = userToUpdate.copy(description = value)
+            }
+        }
+        return@withContext ICookApi.retrofitService.updateUser(userToUpdate)
     }
 
 }

@@ -96,8 +96,11 @@ fun ICookApp(
             }
             composable(route = ICookScreen.Profile.name) {
                 ProfileScreen(
+                    user = userState,
+                    onDescriptionTextFieldClicked = {newValue: String -> viewModel.onDescriptionTextFieldClicked(newValue)},
                     onHomeButtonClicked = { switchTo(navController, ICookScreen.Home) },
-                    onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost)}
+                    onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost)},
+                    persistNewUserDescription = {viewModel.persistNewUserDescription()}
                 )
             }
 

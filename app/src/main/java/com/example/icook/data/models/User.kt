@@ -8,3 +8,12 @@ data class User(
     val picture: String = "",
     val password: String = "qwe",
 )
+
+data class UserToUpdate(
+    val username: String = "",
+    val name: String? = null,
+    val lastname: String? = null,
+    val description: String? = null,
+    val picture: String? = null,
+    val password: String? = null,
+)
