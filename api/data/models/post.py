@@ -8,7 +8,7 @@ class Post(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(20), nullable=False)
     description = Column(String(255), nullable=False)
-    picture = Column(String(255))
+    picture = Column(String)
 
     def __init__(
         self,

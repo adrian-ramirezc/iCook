@@ -11,7 +11,7 @@ class User(Base):
     username = Column(String(20), unique=True)
     name = Column(String(50), nullable=False)
     lastname = Column(String(50), nullable=False)
-    password = Column(String(20), nullable=False)
+    password = Column(String, nullable=False)
     description = Column(String(255), default="Hello, I am new to iCook!")
     picture = Column(String(255), default="")
 
