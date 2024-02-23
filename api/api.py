@@ -74,6 +74,20 @@ class UsersCreate(Resource):
         )
 
 
+@api.route("/users/update", methods=["PUT"])
+class UsersCreate(Resource):
+    @api.marshal_with(message_model)
+    @api.expect(user_model)
+    def put(self):
+        user_dict = api.payload
+        success = user_service.update(user_dict=user_dict)
+        return (
+            ({"message": "User created"}, HTTPStatus.OK)
+            if success
+            else ({"message": "User was not created"}, HTTPStatus.CONFLICT)
+        )
+
+
 @api.route("/users/<username>")
 class UsersResource(Resource):
     @api.marshal_with(user_model, skip_none=True)
