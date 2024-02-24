@@ -13,7 +13,7 @@ class User(Base):
     lastname = Column(String(50), nullable=False)
     password = Column(String, nullable=False)
     description = Column(String(255), default="Hello, I am new to iCook!")
-    picture = Column(String(255), default="")
+    picture = Column(String, default="")
 
     def __init__(
         self,
