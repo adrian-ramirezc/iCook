@@ -8,6 +8,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -46,6 +47,9 @@ interface ICookApiService {
 
     @GET("posts/{username}")
     suspend fun getUserPosts(@Path("username") username: String): Response<List<Post>>
+
+    @DELETE("posts/delete/{id}")
+    suspend fun deletePost(@Path("id") id: Int): Response<SimpleMessage>
 }
 
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.R
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.UserPostOptions
 import com.example.icook.data.models.User
 import com.example.icook.ui.components.BottomNavigationBar
 import com.example.icook.ui.components.FeedPostList
@@ -47,7 +48,8 @@ fun ProfileScreen(
     onHomeButtonClicked: () -> Unit = {},
     onCreatePostButtonClicked: () -> Unit = {},
     persistNewUserDescription: () -> Unit = {},
-    ) {
+    onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->}
+) {
 
     var isDescriptionEnabled by remember {
         mutableStateOf<Boolean>(false)
@@ -136,7 +138,9 @@ fun ProfileScreen(
         )
         FeedPostList(
             modifier = Modifier.weight(1f),
-            posts = posts
+            posts = posts,
+            onPostOptionClicked = onPostOptionClicked,
+            isUserPosts = true,
         )
         //LazyVerticalGrid(
         //    columns = GridCells.Adaptive(minSize = 96.dp),

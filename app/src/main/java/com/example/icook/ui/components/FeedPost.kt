@@ -1,6 +1,5 @@
 package com.example.icook.ui.components
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,13 +11,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,39 +36,68 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.R
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.UserPostOptions
 import com.example.icook.utils.loadImageFromBase64
 
 @Composable
 fun FeedPost(
     post : Post = Post(),
-    modifier : Modifier = Modifier,
+    onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ -> },
+    isUserPost: Boolean = false,
 ) {
-    var context = LocalContext.current
-    Column(
-        modifier = modifier
-    ){
+    var dropMenuExpanded by remember {
+        mutableStateOf(false)
+    }
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.default_user),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-            )
-            Text(
-                text = "@${post.username}",
-                modifier = Modifier.padding(start=5.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                ){
+                Image(
+                    painter = painterResource(id = R.drawable.default_user),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                )
+                Text(
+                    text = "@${post.username}",
+                    modifier = Modifier.padding(start=5.dp)
+                )
+            }
+
+            if (isUserPost) {
+                IconButton(
+                    onClick = { dropMenuExpanded = true }
+                ) {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    DropdownMenu(
+                        expanded = dropMenuExpanded,
+                        onDismissRequest = { dropMenuExpanded = false }
+                    ) {
+                        UserPostOptions.entries.forEach { postOption ->
+                            DropdownMenuItem(
+                                text = { Text(text = postOption.name) },
+                                onClick = {
+                                    dropMenuExpanded = false
+                                    onPostOptionClicked(post, postOption)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
         Image(
             painter = if (post.picture != "") {
-                loadImageFromBase64(base64Image = post.picture, context = context)
+                loadImageFromBase64(base64Image = post.picture, context = LocalContext.current)
             } else {
                 painterResource(id = R.drawable.default_post)
                    },
@@ -114,12 +150,18 @@ fun FeedPost(
 fun FeedPostList(
     modifier : Modifier = Modifier,
     posts: List<Post> = listOf(),
+    onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
+    isUserPosts: Boolean = false,
 ){
     LazyColumn(
         modifier = modifier
     ) {
         items(posts) {post ->
-            FeedPost(post = post)
+            FeedPost(
+                post = post,
+                onPostOptionClicked = onPostOptionClicked,
+                isUserPost = isUserPosts,
+            )
         }
     }
 }
@@ -131,6 +173,7 @@ fun FeedPostComponentPreview() {
         post = Post(
             username = "aramirez",
             description = "This is an awesome description"
-        )
+        ),
+        isUserPost = true,
     )
 }

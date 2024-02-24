@@ -12,6 +12,7 @@ import com.example.icook.data.models.Post
 import com.example.icook.data.models.RawPost
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
+import com.example.icook.data.models.UserPostOptions
 import com.example.icook.data.models.UserToUpdate
 import com.example.icook.network.ICookApi
 import com.example.icook.utils.hashPassword
@@ -379,7 +380,7 @@ class ICookViewModel : ViewModel() {
         return@withContext ICookApi.retrofitService.updateUser(userToUpdate)
     }
 
-    fun switchToProfile(navController: NavHostController){
+    private fun fetchUserPosts(){
         viewModelScope.launch{
             var postsResponse = getUserPosts(username = userState.value.username)
             if (postsResponse.isSuccessful) {
@@ -391,6 +392,9 @@ class ICookViewModel : ViewModel() {
                 }
             }
         }
+    }
+    fun switchToProfile(navController: NavHostController){
+        fetchUserPosts()
         switchTo(navController, ICookScreen.Profile)
     }
 
@@ -415,5 +419,18 @@ class ICookViewModel : ViewModel() {
 
     private suspend fun getFeedPosts(username: String): Response<List<Post>> = withContext(Dispatchers.IO) {
         return@withContext ICookApi.retrofitService.getUserPosts(username)
+    }
+
+    fun onPostOptionClicked(post: Post, postOption: UserPostOptions){
+        if (postOption == UserPostOptions.Delete) {
+            viewModelScope.launch {
+                deletePost(post.id!!)
+                fetchUserPosts()
+            }
+        }
+    }
+
+    private suspend fun deletePost(postId: Int): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.deletePost(postId)
     }
 }

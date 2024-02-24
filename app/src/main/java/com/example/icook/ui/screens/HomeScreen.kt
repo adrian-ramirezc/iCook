@@ -40,11 +40,6 @@ fun HomeScreen(
                 text = "Hello, ${user.name} !",
                 modifier = Modifier.padding(15.dp)
             )
-            TextButton(
-                onClick = { /*TODO*/ }
-            ) {
-                Icon(Icons.Outlined.MailOutline, contentDescription = null)
-            }
         }
         FeedPostList(
             modifier = Modifier.weight(1f),
@@ -63,6 +58,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
+        user = User(username = "aramirez", name="Adrian"),
         onProfileButtonClicked = {},
         onCreatePostButtonClicked = {},
         feedPosts = listOf(

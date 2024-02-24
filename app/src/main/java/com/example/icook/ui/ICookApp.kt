@@ -99,7 +99,8 @@ fun ICookApp(
                     onDescriptionTextFieldClicked = {newValue: String -> viewModel.onDescriptionTextFieldClicked(newValue)},
                     onHomeButtonClicked = { viewModel.switchToHome(navController=navController)  },
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost)},
-                    persistNewUserDescription = {viewModel.persistNewUserDescription()}
+                    persistNewUserDescription = {viewModel.persistNewUserDescription()},
+                    onPostOptionClicked = {post, postOption -> viewModel.onPostOptionClicked(post, postOption)},
                 )
             }
 

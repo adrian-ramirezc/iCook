@@ -8,8 +8,11 @@ data class RawPost(
     val isValidating: Boolean = false,
 )
 data class Post(
+    val id: Int? = null,
     val username: String = "",
     val description: String = "",
     val picture: String = "",
-) {
+)
+enum class UserPostOptions{
+    Delete,
 }
