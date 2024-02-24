@@ -17,9 +17,7 @@ import com.example.icook.data.models.User
 import com.example.icook.data.models.UserPostOptions
 import com.example.icook.data.models.UserToUpdate
 import com.example.icook.network.ICookApi
-import com.example.icook.utils.hashPassword
 import com.example.icook.utils.uriToBase64
-import com.example.icook.utils.verifyPassword
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -114,7 +112,7 @@ class ICookViewModel : ViewModel() {
         }
     }
     fun onPasswordChange(currentPassword: String, newPassword: String) {
-        var realNewPassword: String = ""
+        var realNewPassword : String
         if (newPassword.length < currentPassword.length) {
             realNewPassword = currentPassword.substring(
                 startIndex = 0,
@@ -345,7 +343,7 @@ class ICookViewModel : ViewModel() {
                     uri = newRawPostState.value.uri,
                     contentResolver = contentResolver!!
                 )
-                var post = Post(
+                val post = Post(
                     username = userState.value.username,
                     description = newRawPostState.value.description,
                     picture = picture!!,
@@ -379,8 +377,8 @@ class ICookViewModel : ViewModel() {
             if (uri == null) {
                 showSnackbarMessage(message = "No picture selected")
             } else {
-                var picture = uriToBase64(uri=uri, contentResolver = contentResolver)
-                var responseUpdateUser = updateUser(username = userState.value.username, mapOf("picture" to picture!!))
+                val picture = uriToBase64(uri=uri, contentResolver = contentResolver)
+                val responseUpdateUser = updateUser(username = userState.value.username, mapOf("picture" to picture!!))
                 if (responseUpdateUser.isSuccessful){
                     profileScreenSF.setUserPictureScreenEnabled(false)
                     fetchUser()
@@ -414,9 +412,9 @@ class ICookViewModel : ViewModel() {
 
     private fun fetchUserPosts(){
         viewModelScope.launch{
-            var postsResponse = getUserPosts(username = userState.value.username)
+            val postsResponse = getUserPosts(username = userState.value.username)
             if (postsResponse.isSuccessful) {
-                var posts = postsResponse.body()
+                val posts = postsResponse.body()
                 _uiState.update {
                     it.copy(
                         userPosts = posts!!
@@ -434,7 +432,7 @@ class ICookViewModel : ViewModel() {
         viewModelScope.launch{
             var postsResponse = getFeedPostsWithUsers(username = userState.value.username)
             if (postsResponse.isSuccessful) {
-                var postsWithUsers = postsResponse.body()
+                val postsWithUsers = postsResponse.body()
                 _uiState.update {
                     it.copy(
                         feedPostsWithUsers = postsWithUsers!!

@@ -1,6 +1,5 @@
 package com.example.icook.ui
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
