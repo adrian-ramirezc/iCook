@@ -175,7 +175,7 @@ fun ProfileScreen(
             )
         }
         Text(
-            text = "Your Posts",
+            text = "Posts",
             modifier = Modifier.padding(start = 15.dp, top = 10.dp, bottom = 4.dp)
         )
         FeedPostList(
