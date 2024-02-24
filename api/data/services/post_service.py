@@ -15,3 +15,6 @@ class PostService:
 
     def get_by_username(self, username: str) -> List[Post]:
         return self.post_repository.get_by_username(username=username)
+
+    def delete(self, id: int) -> bool:
+        return self.post_repository.delete(id=id)

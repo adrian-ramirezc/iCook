@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import Column, Integer, String
 
 from data.database import Base
@@ -14,8 +16,10 @@ class Post(Base):
         self,
         username: str,
         description: str,
-        picture: str = "",
+        picture: Optional[str] = None,
+        id: Optional[int] = None,
     ):
+        self.id = id
         self.username = username
         self.description = description
         self.picture = picture

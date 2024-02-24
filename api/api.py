@@ -34,6 +34,7 @@ user_model = api.model(
 post_model = api.model(
     "Post Model",
     {
+        "id": fields.Integer(example="123456"),
         "username": fields.String(example="aramirez"),
         "description": fields.String(example="Hello, check out my new post!"),
         "picture": fields.String(example="/path/to/picture"),
@@ -74,7 +75,7 @@ class UsersCreate(Resource):
 
 
 @api.route("/users/update", methods=["PUT"])
-class UsersCreate(Resource):
+class UsersUpdate(Resource):
     @api.marshal_with(message_model)
     @api.expect(user_model)
     def put(self):
@@ -115,8 +116,19 @@ class PostsResource(Resource):
     @api.marshal_with(post_model)
     def get(self, username):
         posts = post_service.get_by_username(username=username)
-        status_code = HTTPStatus.OK if posts else HTTPStatus.NOT_FOUND
-        return posts, status_code
+        return posts, HTTPStatus.OK
+
+
+@api.route("/posts/delete/<id>", methods=["DELETE"])
+class PostDelete(Resource):
+    @api.marshal_with(message_model)
+    def delete(self, id: str):
+        success = post_service.delete(id=int(id))
+        return (
+            ({"message": "Post deleted"}, HTTPStatus.OK)
+            if success
+            else ({"message": "Post was not deleted"}, HTTPStatus.CONFLICT)
+        )
 
 
 if __name__ == "__main__":

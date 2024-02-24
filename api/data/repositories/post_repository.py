@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from data.models.post import Post
 from data.models.user import User
@@ -31,3 +31,15 @@ class PostRepository:
         if not posts:
             logger.debug(f"No posts found for User(username={username})")
         return posts
+
+    def delete(self, id: int) -> bool:
+        success = False
+        try:
+            stmt = delete(Post).where(Post.id == id)
+            self.db_session.execute(stmt)
+            self.db_session.commit()
+            success = True
+            logger.debug(f"Post id = {id} deleted")
+        except Exception as e:
+            logger.error(stmt, e.args)
+        return success
