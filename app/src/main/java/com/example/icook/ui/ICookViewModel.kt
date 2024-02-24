@@ -1,5 +1,6 @@
 package com.example.icook.ui
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
@@ -54,6 +55,10 @@ class ProfileScreenStateFlow{
                 userPictureScreenEnabled = value
             )
         }
+    }
+
+    fun reset(){
+        _profileScreenState.update { ProfileScreenState() }
     }
 }
 
@@ -284,12 +289,14 @@ class ICookViewModel : ViewModel() {
             setIsValidatingForm(value = false)
             if (userResponse.isSuccessful) {
                 Log.d(TAG, "Username already exists" )
+                showSnackbarMessage("Username already exists")
             } else {
                 Log.d(TAG, "Username is available")
                 val createResponse = createUser(user = userState.value)
                 if (createResponse.isSuccessful) {
                     switchToHome(navController=navController)
                 } else {
+                    showSnackbarMessage("User was not created")
                     Log.e(TAG, "User was not created: $createResponse")
                 }
             }
@@ -476,5 +483,23 @@ class ICookViewModel : ViewModel() {
 
     private suspend fun deletePost(postId: Int): Response<SimpleMessage> = withContext(Dispatchers.IO) {
         return@withContext ICookApi.retrofitService.deletePost(postId)
+    }
+
+    fun onLogOutButtonClicked(navController: NavHostController){
+        _uiState.update { ICookState() }
+        _userState.update { User() }
+        _newRawPostState.update { RawPost() }
+        _formState.update { FormState() }
+        profileScreenSF.reset()
+
+        switchTo(navController = navController, screen = ICookScreen.SignUp)
+    }
+
+    @SuppressLint("RestrictedApi")
+    fun switchTo(navController: NavHostController, screen: ICookScreen) {
+        navController.popBackStack(ICookScreen.SignUp.name, inclusive = false)
+        if (navController.currentBackStack.value[1].destination.route != screen.name) {
+            navController.navigate(screen.name)
+        }
     }
 }

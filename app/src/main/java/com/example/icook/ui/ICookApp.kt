@@ -61,7 +61,7 @@ fun ICookApp(
                     onShowHidePasswordButtonClicked = {viewModel.onShowHidePasswordButtonClicked()},
                     onPasswordChange = {currentPassword, newValue -> viewModel.onPasswordChange(currentPassword,newValue)},
                     onSignUpButtonClicked = {viewModel.onSignUpButtonClicked(navController)},
-                    onLogInTextButtonClicked = { switchTo(navController, ICookScreen.LogIn)}
+                    onLogInTextButtonClicked = { viewModel.switchTo(navController, ICookScreen.LogIn) }
                 )
             }
             composable(route = ICookScreen.LogIn.name){
@@ -80,7 +80,7 @@ fun ICookApp(
                     user = userState,
                     feedPostsWithUsers = uiState.feedPostsWithUsers,
                     onProfileButtonClicked = { viewModel.switchToProfile(navController=navController) },
-                    onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost) }
+                    onCreatePostButtonClicked = { viewModel.switchTo(navController, ICookScreen.CreatePost) }
                 )
             }
             composable(route = ICookScreen.CreatePost.name) {
@@ -102,21 +102,14 @@ fun ICookApp(
                     userPictureScreenEnabled = profileScreenState.userPictureScreenEnabled,
                     setUserPictureScreenEnabled = {value: Boolean -> viewModel.profileScreenSF.setUserPictureScreenEnabled(value)},
                     onHomeButtonClicked = { viewModel.switchToHome(navController=navController)  },
-                    onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost)},
+                    onCreatePostButtonClicked = { viewModel.switchTo(navController, ICookScreen.CreatePost)},
                     persistNewUserDescription = {newDescription: String -> viewModel.persistNewUserDescription(newDescription)},
                     onPostOptionClicked = {post, postOption -> viewModel.onPostOptionClicked(post, postOption)},
-                    onUpdateUserPictureClicked = {uri: Uri? ->  viewModel.persistNewUserProfilePicture(uri = uri, contentResolver=contentResolver)}
+                    onUpdateUserPictureClicked = {uri: Uri? ->  viewModel.persistNewUserProfilePicture(uri = uri, contentResolver=contentResolver)},
+                    onLogOutButtonClicked = {viewModel.onLogOutButtonClicked(navController)}
                 )
             }
 
         }
-    }
-}
-
-@SuppressLint("RestrictedApi")
-fun switchTo(navController: NavHostController, screen: ICookScreen) {
-    navController.popBackStack(ICookScreen.Home.name, inclusive = false)
-    if (navController.currentBackStack.value[1].destination.route != screen.name) {
-        navController.navigate(screen.name)
     }
 }

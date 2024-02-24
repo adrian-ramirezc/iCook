@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.SnackbarHostState
@@ -58,7 +59,8 @@ fun ProfileScreen(
     onUpdateUserPictureClicked: (Uri?) -> Unit = {},
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
     userPictureScreenEnabled : Boolean = false,
-    setUserPictureScreenEnabled : (newValue : Boolean) -> Unit = {_ -> }
+    setUserPictureScreenEnabled : (newValue : Boolean) -> Unit = {_ -> },
+    onLogOutButtonClicked: () -> Unit = {}
 ) {
     var descriptionEditingEnabled by remember { mutableStateOf<Boolean>(false) }
     var userDescription by remember { mutableStateOf<String>(user.description) }
@@ -66,10 +68,27 @@ fun ProfileScreen(
     Column(
         modifier = if (userPictureScreenEnabled) {Modifier.blur(3.dp)} else {Modifier}
     ) {
-        Text(
-            text = "@${user.username}",
-            modifier = Modifier.padding(start = 25.dp, top = 15.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 25.dp, top = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "@${user.username}",
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = "Log out")
+                TextButton(
+                    onClick = { onLogOutButtonClicked() }
+                ) {
+                    Icon(Icons.Default.ExitToApp, contentDescription = null)
+                }
+            }
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
