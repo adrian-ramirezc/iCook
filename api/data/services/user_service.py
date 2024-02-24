@@ -10,10 +10,14 @@ class UserService:
 
     def create(self, user_dict: dict) -> bool:
         user = User.from_dict(user_dict)
+        user.hash_password()
         return self.user_repository.create(user=user)
 
     def get(self, username: str) -> Optional[User]:
         return self.user_repository.get(username=username)
+
+    def log_in(self, username: str, password: str) -> str:
+        return self.user_repository.log_in(username=username, password=password)
 
     def get_many(self, usernames: List[str]) -> List[User]:
         return self.user_repository.get_many(usernames=usernames)

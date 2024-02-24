@@ -1,5 +1,6 @@
 from typing import Optional
 
+import bcrypt
 from sqlalchemy import Column, Integer, String
 
 from data.database import Base
@@ -21,7 +22,7 @@ class User(Base):
         name: str,
         lastname: str,
         password: str,
-        description: Optional[str] = None,
+        description: Optional[str] = "Hello!, I am new to iCook",
         picture: Optional[str] = None,
     ):
         self.username = username
@@ -36,3 +37,10 @@ class User(Base):
 
     def from_dict(user_dict: dict):
         return User(**user_dict)
+
+    def hash_password(self):
+        salt = bcrypt.gensalt()
+        self.password = bcrypt.hashpw(self.password.encode("utf-8"), salt).decode("utf-8")
+
+    def verify_password(self, password: str):
+        return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))

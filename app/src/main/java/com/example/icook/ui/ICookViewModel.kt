@@ -246,7 +246,7 @@ class ICookViewModel : ViewModel() {
             Log.d(TAG, "Sign Up Form is not valid")
             setIsValidatingForm(value = false)
         } else {
-            tryCreateUser(user = userState.value, navController=navController)
+            tryCreateUser(navController=navController)
         }
     }
 
@@ -256,51 +256,33 @@ class ICookViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.Main) {
                 showSnackbarMessage(message = "Invalid Form")
             }
-            Log.d(TAG, "Log In Form is not valid")
             setIsValidatingForm(value = false)
         } else {
-            tryLogInUser(user = userState.value, navController = navController)
+            tryLogInUser(navController = navController)
         }
     }
 
-    private fun tryLogInUser(user: User, navController: NavHostController) {
+    private fun tryLogInUser(navController: NavHostController) {
         viewModelScope.launch(Dispatchers.Main) {
-            val userResponse = getUser(username = user.username)
+            val loginResponse = loginUser(userState.value.username, userState.value.password)
             setIsValidatingForm(value = false)
-            if (userResponse.code() == 200) {
-                Log.d(TAG, "User found")
-                if (verifyPassword(user.password, userResponse.body()!!.password)) {
-                    _userState.update { userResponse.body()!!.copy(password = "") } // Do not expose user password
-                    switchToHome(navController=navController)
-                } else {
-                    showSnackbarMessage(message = "Wrong Password")
-                    Log.d(TAG, "Incorrect Password")
-                }
+            if (loginResponse.isSuccessful) {
+                switchToHome(navController=navController)
             } else {
-                showSnackbarMessage(message = "User not found")
-                Log.d(TAG, "User not found")
+                    showSnackbarMessage(message = "Wrong username and/or password")
             }
         }
     }
 
-    private fun tryCreateUser(user: User, navController: NavHostController) {
+    private fun tryCreateUser(navController: NavHostController) {
         viewModelScope.launch(Dispatchers.Main) {
-            val userResponse = getUser(username = user.username)
+            val createResponse = createUser(user = userState.value)
             setIsValidatingForm(value = false)
-            if (userResponse.isSuccessful) {
-                Log.d(TAG, "Username already exists" )
+            if (createResponse.isSuccessful) {
+                switchToHome(navController=navController)
+            } else {
                 showSnackbarMessage("Username already exists")
-            } else {
-                Log.d(TAG, "Username is available")
-                val createResponse = createUser(user = userState.value)
-                if (createResponse.isSuccessful) {
-                    switchToHome(navController=navController)
-                } else {
-                    showSnackbarMessage("User was not created")
-                    Log.e(TAG, "User was not created: $createResponse")
-                }
             }
-
         }
     }
 
@@ -308,9 +290,12 @@ class ICookViewModel : ViewModel() {
         return@withContext ICookApi.retrofitService.getUser(username)
     }
 
+    private suspend fun loginUser(username : String, password: String): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.loginUser(username=username, password=password)
+}
+
     private suspend fun createUser(user : User): Response<SimpleMessage> = withContext(Dispatchers.IO) {
-        val hashedUser = user.copy(password = hashPassword(user.password))
-        return@withContext ICookApi.retrofitService.createUser(hashedUser)
+        return@withContext ICookApi.retrofitService.createUser(user)
     }
 
     fun updateNewRawPostUri(newUri: Uri?){
@@ -460,6 +445,7 @@ class ICookViewModel : ViewModel() {
     }
 
     fun switchToHome(navController: NavHostController){
+        fetchUser()
         fetchFeedPostsWithUsers()
         switchTo(navController, ICookScreen.Home)
     }

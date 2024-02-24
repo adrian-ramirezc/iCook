@@ -19,15 +19,27 @@ api = Api(app, title="iCook", default_label="iCook Namespace")
 init_db()
 
 
+# do not expose password
 user_model = api.model(
     "User Model",
     {
         "name": fields.String(example="Adrian"),
         "lastname": fields.String(example="Ramirez"),
         "username": fields.String(example="aramirez"),
-        "password": fields.String(example="12345678"),
         "description": fields.String(example="Hello, my name is Adrian!"),
-        "picture": fields.String(example="/path/to/picture"),
+        "picture": fields.String(example="encoded picture"),
+    },
+)
+
+user_model_create = api.model(
+    "User Model",
+    {
+        "name": fields.String(example="Adrian"),
+        "lastname": fields.String(example="Ramirez"),
+        "username": fields.String(example="aramirez"),
+        "password": fields.String(example="password"),
+        "description": fields.String(example="Hello, my name is Adrian!"),
+        "picture": fields.String(example="encoded picture"),
     },
 )
 
@@ -72,14 +84,14 @@ def shutdown_session(exception=None):
 @api.route("/users/create")
 class UsersCreate(Resource):
     @api.marshal_with(message_model)
-    @api.expect(user_model)
+    @api.expect(user_model_create)
     def post(self):
         user_dict = api.payload
         success = user_service.create(user_dict=user_dict)
         return (
             ({"message": "User created"}, HTTPStatus.OK)
             if success
-            else ({"message": "User was not created"}, HTTPStatus.CONFLICT)
+            else ({"message": "Username already exists"}, HTTPStatus.CONFLICT)
         )
 
 
@@ -104,6 +116,15 @@ class UsersResource(Resource):
         user = user_service.get(username=username)
         status_code = HTTPStatus.OK if user else HTTPStatus.NOT_FOUND
         return user, status_code
+
+
+@api.route("/users/login/<username>/<password>")
+class UsersLoginResource(Resource):
+    @api.marshal_with(message_model, skip_none=True)
+    def get(self, username, password):
+        message = user_service.log_in(username=username, password=password)
+        status_code = HTTPStatus.OK if message == "success" else HTTPStatus.NOT_FOUND
+        return {"message": message}, status_code
 
 
 @api.route("/posts/create")

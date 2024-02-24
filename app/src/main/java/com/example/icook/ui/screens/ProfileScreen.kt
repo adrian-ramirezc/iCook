@@ -63,7 +63,7 @@ fun ProfileScreen(
     onLogOutButtonClicked: () -> Unit = {}
 ) {
     var descriptionEditingEnabled by remember { mutableStateOf<Boolean>(false) }
-    var userDescription by remember { mutableStateOf<String>(user.description) }
+    var userDescription by remember { mutableStateOf<String>(user.description!!) }
 
     Column(
         modifier = if (userPictureScreenEnabled) {Modifier.blur(3.dp)} else {Modifier}

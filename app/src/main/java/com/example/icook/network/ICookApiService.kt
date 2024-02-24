@@ -50,6 +50,9 @@ interface ICookApiService {
     @GET("users/{username}")
     suspend fun getUser(@Path("username") username: String): Response<User>
 
+    @GET("users/login/{username}/{password}")
+    suspend fun loginUser(@Path("username") username: String, @Path("password") password: String): Response<SimpleMessage>
+
     @POST("posts/create")
     suspend fun createPost(@Body requestBody: Post): Response<SimpleMessage>
 

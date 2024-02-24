@@ -33,6 +33,14 @@ class UserRepository:
         assert len(users) == 1, "usernames should be unique"
         return users[0]
 
+    def log_in(self, username: str, password: str) -> str:
+        retrieved_user = self.get(username=username)
+        if not retrieved_user:
+            return "User not found"
+        if not retrieved_user.verify_password(password=password):
+            return "Wrong password"
+        return "success"
+
     def get_many(self, usernames: List[str]) -> List[User]:
         stmt = select(User).where(User.username.in_(usernames))
         result = self.db_session.execute(stmt)

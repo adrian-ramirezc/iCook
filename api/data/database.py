@@ -19,7 +19,6 @@ def add_test_data():
     from data.models.post import Post
     from data.models.user import User
 
-    # Users (password hashs = "qwe")
     user_pictures = []
     users_folder_path = "data/imgs/users"
     for filename in os.listdir(users_folder_path):
@@ -32,35 +31,35 @@ def add_test_data():
             username="aramirez",
             name="Adrian",
             lastname="Ramirez",
-            password="$2a$10$hJxu4TPm.wHAaJlkXv6h9.SK38nqZGRYoj0UdRWTKxfNyHf9A/d3K",
+            password="qwe",
             picture=user_pictures[0],
         ),
         User(
             username="fcastror",
             name="Franco",
             lastname="Castro",
-            password="$2a$10$hJxu4TPm.wHAaJlkXv6h9.SK38nqZGRYoj0UdRWTKxfNyHf9A/d3K",
+            password="castro",
             picture=user_pictures[3],
         ),
         User(
             username="atorres34",
             name="Angel",
             lastname="Torres",
-            password="$2a$10$hJxu4TPm.wHAaJlkXv6h9.SK38nqZGRYoj0UdRWTKxfNyHf9A/d3K",
+            password="torres",
             picture=user_pictures[1],
         ),
         User(
             username="aparedes12",
             name="Armando",
             lastname="Paredes",
-            password="$2a$10$hJxu4TPm.wHAaJlkXv6h9.SK38nqZGRYoj0UdRWTKxfNyHf9A/d3K",
+            password="paredes",
             picture=user_pictures[2],
         ),
         User(
             username="equito66",
             name="Esteban",
             lastname="Quito",
-            password="$2a$10$hJxu4TPm.wHAaJlkXv6h9.SK38nqZGRYoj0UdRWTKxfNyHf9A/d3K",
+            password="quito",
             picture=user_pictures[4],
         ),
     ]
@@ -101,6 +100,7 @@ def add_test_data():
     ]
 
     for user in users:
+        user.hash_password()
         db_session.add(user)
 
     for post in posts:
