@@ -41,27 +41,23 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     user: User = User(),
     posts_counter: Int = 15,
-    followers_counter: Int = 30,
-    following_counter: Int = 45,
-    posts: List<Post> = listOf<Post>(),
+    likes_counter: Int = 30,
+    posts: List<Post> = listOf(),
     onDescriptionTextFieldClicked: (String) -> Unit = {a: String ->},
     onHomeButtonClicked: () -> Unit = {},
     onCreatePostButtonClicked: () -> Unit = {},
     persistNewUserDescription: () -> Unit = {},
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->}
 ) {
-
-    var isDescriptionEnabled by remember {
-        mutableStateOf<Boolean>(false)
-    }
+    var isDescriptionEnabled by remember { mutableStateOf<Boolean>(false) }
 
     Column(
         modifier = modifier
     ) {
         Text(
             text = "@${user.username}",
-            modifier = Modifier.padding(15.dp)
-            )
+            modifier = Modifier.padding(start = 25.dp, top = 15.dp)
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,20 +83,10 @@ fun ProfileScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "$followers_counter")
-                Text(text = "followers")
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "$following_counter")
-                Text(text = "following")
+                Text(text = "$likes_counter")
+                Text(text = "likes")
             }
         }
-        Text(
-            text = "${user.name} ${user.lastname}",
-            modifier = Modifier.padding(start = 25.dp)
-            )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,32 +95,35 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
+                label = {Text(text = "${user.name} ${user.lastname}")},
                 modifier = Modifier.weight(0.8f),
                 maxLines = 3,
                 enabled = isDescriptionEnabled,
                 value = user.description,
-                onValueChange ={newValue -> onDescriptionTextFieldClicked(newValue)}
+                trailingIcon = {
+                    IconToggleButton(
+                        checked = true,
+                        modifier = Modifier.weight(0.2f),
+                        onCheckedChange = {checked ->
+                            isDescriptionEnabled = !isDescriptionEnabled
+                            if (!checked) {
+                                persistNewUserDescription()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            if (isDescriptionEnabled) {Icons.Default.Check} else {Icons.Default.Create}
+                            , contentDescription = null
+                        )
+                        }},
+                        onValueChange ={newValue -> onDescriptionTextFieldClicked(newValue)}
             )
-            IconToggleButton(
-                checked = isDescriptionEnabled,
-                modifier = Modifier.weight(0.2f),
-                onCheckedChange = {checked ->
-                    isDescriptionEnabled = !isDescriptionEnabled
-                    if (!checked) {
-                        persistNewUserDescription()
-                    }
-                }
-            ) {
-                Icon(
-                    if (isDescriptionEnabled) {Icons.Default.Check} else {Icons.Default.Create}
-                    , contentDescription = null
-                )
-            }
+
         }
 
         Text(
             text = "Your Posts",
-            modifier = Modifier.padding(15.dp)
+            modifier = Modifier.padding(start = 15.dp, top = 10.dp, bottom = 4.dp)
         )
         FeedPostList(
             modifier = Modifier.weight(1f),
@@ -142,17 +131,6 @@ fun ProfileScreen(
             onPostOptionClicked = onPostOptionClicked,
             isUserPosts = true,
         )
-        //LazyVerticalGrid(
-        //    columns = GridCells.Adaptive(minSize = 96.dp),
-        //    modifier = Modifier.weight(1f)
-        //){
-        //    items(18) {Image(
-          //      painter = painterResource(id = R.drawable.default_post),
-            //    contentDescription = null,
-              //  modifier = Modifier.fillMaxWidth(),
-                //contentScale = ContentScale.Crop,
-           // )}
-        //}
         BottomNavigationBar(
             onHomeButtonClicked = onHomeButtonClicked,
             onCreatePostButtonClicked = onCreatePostButtonClicked,
@@ -163,5 +141,13 @@ fun ProfileScreen(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview(){
-    ProfileScreen(user=User(username = "aramirez", name = "Adrian", lastname = "Ramirez"))
+    ProfileScreen(
+        user=User(
+            username = "aramirez",
+            name = "Adrian",
+            lastname = "Ramirez",
+            description = "This is a basic description"
+        ),
+        posts = listOf(Post(), Post())
+    )
 }
