@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from sqlalchemy import select, update
 
@@ -32,6 +32,12 @@ class UserRepository:
             return
         assert len(users) == 1, "usernames should be unique"
         return users[0]
+
+    def get_many(self, usernames: List[str]) -> List[User]:
+        stmt = select(User).where(User.username.in_(usernames))
+        result = self.db_session.execute(stmt)
+        users = result.scalars().all()
+        return users
 
     def update(self, username: str, keys: Dict[str, str]):
         success = False

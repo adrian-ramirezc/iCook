@@ -42,6 +42,14 @@ post_model = api.model(
     },
 )
 
+post_model_with_user = api.model(
+    "Post - User Model",
+    {
+        "post": fields.Nested(post_model),
+        "user": fields.Nested(user_model),
+    },
+)
+
 message_model = api.model(
     "Message",
     {
@@ -83,9 +91,9 @@ class UsersUpdate(Resource):
         user_dict = api.payload
         success = user_service.update(user_dict=user_dict)
         return (
-            ({"message": "User created"}, HTTPStatus.OK)
+            ({"message": "User updated"}, HTTPStatus.OK)
             if success
-            else ({"message": "User was not created"}, HTTPStatus.CONFLICT)
+            else ({"message": "User was not updated"}, HTTPStatus.CONFLICT)
         )
 
 
@@ -122,10 +130,14 @@ class PostsResource(Resource):
 
 @api.route("/posts/feed/<username>")
 class PostsResource(Resource):
-    @api.marshal_with(post_model)
+    @api.marshal_with(post_model_with_user)
     def get(self, username):
         posts = post_service.get_for_username(username=username)
-        return posts, HTTPStatus.OK
+        users_with_posts = list({post.username for post in posts})
+        users = user_service.get_many(usernames=users_with_posts)
+        users_dict = {user.username: user for user in users}
+        posts_with_users = [{"post": post, "user": users_dict[post.username]} for post in posts]
+        return posts_with_users, HTTPStatus.OK
 
 
 @api.route("/posts/delete/<id>", methods=["DELETE"])
