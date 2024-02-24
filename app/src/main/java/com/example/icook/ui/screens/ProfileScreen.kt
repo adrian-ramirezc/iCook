@@ -53,16 +53,18 @@ fun ProfileScreen(
     posts: List<Post> = listOf(),
     onHomeButtonClicked: () -> Unit = {},
     onCreatePostButtonClicked: () -> Unit = {},
+    onProfileButtonClicked: () -> Unit = {},
     persistNewUserDescription: (newUserDescription: String ) -> Unit = {},
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
     onUpdateUserPictureClicked: (Uri?) -> Unit = {},
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
     userPictureScreenEnabled : Boolean = false,
     setUserPictureScreenEnabled : (newValue : Boolean) -> Unit = {_ -> },
-    onLogOutButtonClicked: () -> Unit = {}
+    onLogOutButtonClicked: () -> Unit = {},
+    isMyProfile: Boolean = true,
 ) {
     var descriptionEditingEnabled by remember { mutableStateOf<Boolean>(false) }
-    var userDescription by remember { mutableStateOf<String>(user.description!!) }
+    var userDescription by remember { mutableStateOf<String>(user.description?: "Description not found") }
 
     Column(
         modifier = if (userPictureScreenEnabled) {Modifier.blur(3.dp)} else {Modifier}
@@ -77,14 +79,16 @@ fun ProfileScreen(
             Text(
                 text = "@${user.username}",
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(text = "Log out")
-                TextButton(
-                    onClick = { onLogOutButtonClicked() }
+            if (isMyProfile) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Default.ExitToApp, contentDescription = null)
+                    Text(text = "Log out")
+                    TextButton(
+                        onClick = { onLogOutButtonClicked() }
+                    ) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = null)
+                    }
                 }
             }
         }
@@ -92,10 +96,11 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
             TextButton(
+                enabled=isMyProfile,
                 onClick = {
                     setUserPictureScreenEnabled(true)
                 }
@@ -114,17 +119,24 @@ fun ProfileScreen(
                         .border(1.dp, Color.DarkGray, CircleShape)
                 )
             }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Text(text = "${posts.size}")
-                Text(text = "posts")
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "$likes_counter")
-                Text(text = "likes")
+                Column(
+                    modifier = Modifier.padding(15.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Text(text = "${posts.size}")
+                    Text(text = "posts")
+                }
+                Column(
+                    modifier = Modifier.padding(15.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "$likes_counter")
+                    Text(text = "likes")
+                }
             }
         }
         Row(
@@ -151,11 +163,14 @@ fun ProfileScreen(
                             }
                         }
                     ) {
-                        Icon(
-                            if (descriptionEditingEnabled) {Icons.Default.Check} else {Icons.Default.Create}
-                            , contentDescription = null
-                        )
-                        }},
+                        if (isMyProfile) {
+                            Icon(
+                                if (descriptionEditingEnabled) {Icons.Default.Check} else {Icons.Default.Create}
+                                , contentDescription = null
+                            )
+                        }
+                      }
+                               },
                 onValueChange ={newValue -> userDescription  = newValue}
             )
         }
@@ -167,11 +182,12 @@ fun ProfileScreen(
             modifier = Modifier.weight(1f),
             postsWithUsers = posts.map{ post -> PostWithUser(post = post, user = user) },
             onPostOptionClicked = onPostOptionClicked,
-            isUserPosts = true,
+            isUserPosts = isMyProfile,
         )
         BottomNavigationBar(
             onHomeButtonClicked = onHomeButtonClicked,
             onCreatePostButtonClicked = onCreatePostButtonClicked,
+            onProfileButtonClicked = onProfileButtonClicked,
         )
     }
     if (userPictureScreenEnabled) {
@@ -195,6 +211,7 @@ fun ProfileScreenPreview(){
             lastname = "Ramirez",
             description = "This is a basic description"
         ),
-        posts = listOf(Post(), Post())
+        posts = listOf(Post(), Post()),
+        isMyProfile = true,
     )
 }

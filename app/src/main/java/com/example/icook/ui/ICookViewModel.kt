@@ -18,6 +18,7 @@ import com.example.icook.data.models.UserPostOptions
 import com.example.icook.data.models.UserToUpdate
 import com.example.icook.network.ICookApi
 import com.example.icook.utils.uriToBase64
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,11 +45,11 @@ data class ProfileScreenState(
     val userPictureScreenEnabled: Boolean = false,
 )
 class ProfileScreenStateFlow{
-    private val _profileScreenState = MutableStateFlow(ProfileScreenState())
-    val profileScreenState: StateFlow<ProfileScreenState> = _profileScreenState.asStateFlow()
+    private val _state = MutableStateFlow(ProfileScreenState())
+    val state: StateFlow<ProfileScreenState> = _state.asStateFlow()
 
     fun setUserPictureScreenEnabled(value: Boolean) {
-        _profileScreenState.update {
+        _state.update {
             it.copy(
                 userPictureScreenEnabled = value
             )
@@ -56,7 +57,29 @@ class ProfileScreenStateFlow{
     }
 
     fun reset(){
-        _profileScreenState.update { ProfileScreenState() }
+        _state.update { ProfileScreenState() }
+    }
+}
+
+data class OtherProfileScreenState(
+    val user: User = User(),
+    val userPosts: List<Post> = listOf(),
+)
+class OtherProfileScreenStateFlow{
+    private val _state = MutableStateFlow(OtherProfileScreenState())
+    val state: StateFlow<OtherProfileScreenState> = _state.asStateFlow()
+
+    fun set(user: User, posts: List<Post>) {
+        _state.update {
+            it.copy(
+                user = user,
+                userPosts = posts,
+            )
+        }
+    }
+
+    fun reset(){
+        _state.update { OtherProfileScreenState() }
     }
 }
 
@@ -74,6 +97,8 @@ class ICookViewModel : ViewModel() {
     val formState: StateFlow<FormState> = _formState.asStateFlow()
 
     val profileScreenSF = ProfileScreenStateFlow()
+
+    val otherProfileScreenSF = OtherProfileScreenStateFlow()
 
     fun onUsernameChange(newUsername: String) {
         _userState.update {
@@ -112,7 +137,7 @@ class ICookViewModel : ViewModel() {
         }
     }
     fun onPasswordChange(currentPassword: String, newPassword: String) {
-        var realNewPassword : String
+        val realNewPassword : String
         if (newPassword.length < currentPassword.length) {
             realNewPassword = currentPassword.substring(
                 startIndex = 0,
@@ -425,12 +450,12 @@ class ICookViewModel : ViewModel() {
     }
     fun switchToProfile(navController: NavHostController){
         fetchUserPosts()
-        switchTo(navController, ICookScreen.Profile)
+        switchTo(navController, ICookScreen.MyProfile)
     }
 
     private fun fetchFeedPostsWithUsers(){
         viewModelScope.launch{
-            var postsResponse = getFeedPostsWithUsers(username = userState.value.username)
+            val postsResponse = getFeedPostsWithUsers(username = userState.value.username)
             if (postsResponse.isSuccessful) {
                 val postsWithUsers = postsResponse.body()
                 _uiState.update {
@@ -469,12 +494,23 @@ class ICookViewModel : ViewModel() {
         return@withContext ICookApi.retrofitService.deletePost(postId)
     }
 
+    fun onOtherUserPictureClicked(navController:NavHostController, otherUser: User){
+        viewModelScope.launch{
+            val postsResponse = getUserPosts(username = otherUser.username)
+            if (postsResponse.isSuccessful) {
+                otherProfileScreenSF.set(user = otherUser, posts = postsResponse.body()!!)
+                switchTo(navController = navController, screen = ICookScreen.OtherProfile)
+            }
+        }
+    }
+
     fun onLogOutButtonClicked(navController: NavHostController){
         _uiState.update { ICookState() }
         _userState.update { User() }
         _newRawPostState.update { RawPost() }
         _formState.update { FormState() }
         profileScreenSF.reset()
+        otherProfileScreenSF.reset()
 
         switchTo(navController = navController, screen = ICookScreen.SignUp)
     }

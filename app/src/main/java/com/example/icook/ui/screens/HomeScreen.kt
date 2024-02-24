@@ -21,8 +21,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     user : User = User(),
     feedPostsWithUsers: List<PostWithUser> = listOf(),
-    onProfileButtonClicked: () -> Unit,
-    onCreatePostButtonClicked: () -> Unit,
+    onProfileButtonClicked: () -> Unit = {},
+    onCreatePostButtonClicked: () -> Unit = {},
+    onOtherUserPictureClicked: (user: User) -> Unit = {},
     ) {
     Column(
         modifier = modifier,
@@ -41,6 +42,7 @@ fun HomeScreen(
         FeedPostList(
             modifier = Modifier.weight(1f),
             postsWithUsers = feedPostsWithUsers,
+            onOtherUserPictureClicked = { user: User -> onOtherUserPictureClicked(user) },
         )
         BottomNavigationBar(
             onHomeButtonClicked = {},

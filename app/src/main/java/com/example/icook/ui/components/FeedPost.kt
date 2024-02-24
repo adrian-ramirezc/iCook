@@ -46,6 +46,7 @@ import com.example.icook.utils.loadImageFromBase64
 fun FeedPost(
     post : Post = Post(),
     user: User = User(),
+    onOtherUserPictureClicked: (user: User) -> Unit = { _ -> },
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ -> },
     isUserPost: Boolean = false,
 ) {
@@ -56,25 +57,27 @@ fun FeedPost(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 ){
-                Image(
-                    painter = if (user.picture != "") {
-                        loadImageFromBase64(base64Image = user.picture, context = LocalContext.current)
-                    } else {
-                        painterResource(id = R.drawable.default_user)
-                    },
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                )
+                TextButton(onClick = { onOtherUserPictureClicked(user) }) {
+                    Image(
+                        painter = if (user.picture != "") {
+                            loadImageFromBase64(base64Image = user.picture, context = LocalContext.current)
+                        } else {
+                            painterResource(id = R.drawable.default_user)
+                        },
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                    )
+                }
                 Text(
                     text = "@${post.username}",
                     modifier = Modifier.padding(start=5.dp)
@@ -116,7 +119,7 @@ fun FeedPost(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(start = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
             IconToggleButton(checked = true, onCheckedChange = {}) {
@@ -154,6 +157,7 @@ fun FeedPostList(
     postsWithUsers: List<PostWithUser> = listOf(),
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
     isUserPosts: Boolean = false,
+    onOtherUserPictureClicked: (user: User) -> Unit = {},
 ){
     LazyColumn(
         modifier = modifier
@@ -162,6 +166,7 @@ fun FeedPostList(
             FeedPost(
                 post = postWithUser.post,
                 user = postWithUser.user,
+                onOtherUserPictureClicked = { user: User -> onOtherUserPictureClicked(user) },
                 onPostOptionClicked = onPostOptionClicked,
                 isUserPost = isUserPosts,
             )
