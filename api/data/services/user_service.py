@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from data.models.user import User
 from data.repositories.user_repository import UserRepository
@@ -14,6 +14,9 @@ class UserService:
 
     def get(self, username: str) -> Optional[User]:
         return self.user_repository.get(username=username)
+
+    def get_many(self, usernames: List[str]) -> List[User]:
+        return self.user_repository.get_many(usernames=usernames)
 
     def update(self, user_dict: Dict[str, str]):
         username = user_dict["username"]

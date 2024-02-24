@@ -78,7 +78,7 @@ fun ICookApp(
             composable(route = ICookScreen.Home.name){
                 HomeScreen(
                     user = userState,
-                    feedPosts = uiState.feedPosts,
+                    feedPostsWithUsers = uiState.feedPostsWithUsers,
                     onProfileButtonClicked = { viewModel.switchToProfile(navController=navController) },
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost) }
                 )

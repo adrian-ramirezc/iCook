@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.User
 import com.example.icook.ui.components.BottomNavigationBar
 import com.example.icook.ui.components.FeedPostList
@@ -19,7 +20,7 @@ import com.example.icook.ui.components.FeedPostList
 fun HomeScreen(
     modifier: Modifier = Modifier,
     user : User = User(),
-    feedPosts: List<Post> = listOf<Post>(),
+    feedPostsWithUsers: List<PostWithUser> = listOf(),
     onProfileButtonClicked: () -> Unit,
     onCreatePostButtonClicked: () -> Unit,
     ) {
@@ -39,7 +40,7 @@ fun HomeScreen(
         }
         FeedPostList(
             modifier = Modifier.weight(1f),
-            posts = feedPosts,
+            postsWithUsers = feedPostsWithUsers,
         )
         BottomNavigationBar(
             onHomeButtonClicked = {},
@@ -57,10 +58,10 @@ fun HomeScreenPreview() {
         user = User(username = "aramirez", name="Adrian"),
         onProfileButtonClicked = {},
         onCreatePostButtonClicked = {},
-        feedPosts = listOf(
-            Post(username = "wfrezaq"),
-            Post(username = "usertest"),
-            Post(username = "helloitsme")
+        feedPostsWithUsers = listOf(
+            PostWithUser(post = Post(username = "wfrezaq"), user= User()),
+            PostWithUser(post = Post(username = "usertest"), user = User()),
+            PostWithUser(post = Post(username = "helloitsme"), user = User())
         )
     )
 }

@@ -1,8 +1,7 @@
 package com.example.icook.network
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
 import com.example.icook.data.models.UserToUpdate
@@ -58,7 +57,7 @@ interface ICookApiService {
     suspend fun getUserPosts(@Path("username") username: String): Response<List<Post>>
 
     @GET("posts/feed/{username}")
-    suspend fun getFeedPosts(@Path("username") username: String): Response<List<Post>>
+    suspend fun getFeedPostsWithUsers(@Path("username") username: String): Response<List<PostWithUser>>
 
     @DELETE("posts/delete/{id}")
     suspend fun deletePost(@Path("id") id: Int): Response<SimpleMessage>

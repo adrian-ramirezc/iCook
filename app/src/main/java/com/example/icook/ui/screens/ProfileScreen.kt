@@ -34,9 +34,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
 import com.example.icook.R
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.UserPostOptions
 import com.example.icook.data.models.User
 import com.example.icook.ui.components.BottomNavigationBar
@@ -147,7 +147,7 @@ fun ProfileScreen(
         )
         FeedPostList(
             modifier = Modifier.weight(1f),
-            posts = posts,
+            postsWithUsers = posts.map{ post -> PostWithUser(post = post, user = user) },
             onPostOptionClicked = onPostOptionClicked,
             isUserPosts = true,
         )

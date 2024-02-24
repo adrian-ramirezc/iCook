@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.icook.ICookState
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.RawPost
 import com.example.icook.data.models.SimpleMessage
 import com.example.icook.data.models.User
@@ -437,14 +438,14 @@ class ICookViewModel : ViewModel() {
         switchTo(navController, ICookScreen.Profile)
     }
 
-    private fun fetchFeedPosts(){
+    private fun fetchFeedPostsWithUsers(){
         viewModelScope.launch{
-            var postsResponse = getFeedPosts(username = userState.value.username)
+            var postsResponse = getFeedPostsWithUsers(username = userState.value.username)
             if (postsResponse.isSuccessful) {
-                var posts = postsResponse.body()
+                var postsWithUsers = postsResponse.body()
                 _uiState.update {
                     it.copy(
-                        feedPosts = posts!!
+                        feedPostsWithUsers = postsWithUsers!!
                     )
                 }
             }
@@ -452,7 +453,7 @@ class ICookViewModel : ViewModel() {
     }
 
     fun switchToHome(navController: NavHostController){
-        fetchFeedPosts()
+        fetchFeedPostsWithUsers()
         switchTo(navController, ICookScreen.Home)
     }
 
@@ -460,8 +461,8 @@ class ICookViewModel : ViewModel() {
         return@withContext ICookApi.retrofitService.getUserPosts(username)
     }
 
-    private suspend fun getFeedPosts(username: String): Response<List<Post>> = withContext(Dispatchers.IO) {
-        return@withContext ICookApi.retrofitService.getFeedPosts(username)
+    private suspend fun getFeedPostsWithUsers(username: String): Response<List<PostWithUser>> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.getFeedPostsWithUsers(username)
     }
 
     fun onPostOptionClicked(post: Post, postOption: UserPostOptions){

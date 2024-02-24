@@ -36,6 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.R
 import com.example.icook.data.models.Post
+import com.example.icook.data.models.PostWithUser
+import com.example.icook.data.models.User
 import com.example.icook.data.models.UserPostOptions
 import com.example.icook.utils.getAge
 import com.example.icook.utils.loadImageFromBase64
@@ -43,6 +45,7 @@ import com.example.icook.utils.loadImageFromBase64
 @Composable
 fun FeedPost(
     post : Post = Post(),
+    user: User = User(),
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ -> },
     isUserPost: Boolean = false,
 ) {
@@ -61,7 +64,11 @@ fun FeedPost(
                 verticalAlignment = Alignment.CenterVertically,
                 ){
                 Image(
-                    painter = painterResource(id = R.drawable.default_user),
+                    painter = if (user.picture != "") {
+                        loadImageFromBase64(base64Image = user.picture, context = LocalContext.current)
+                    } else {
+                        painterResource(id = R.drawable.default_user)
+                    },
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -147,16 +154,17 @@ fun FeedPost(
 @Composable
 fun FeedPostList(
     modifier : Modifier = Modifier,
-    posts: List<Post> = listOf(),
+    postsWithUsers: List<PostWithUser> = listOf(),
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
     isUserPosts: Boolean = false,
 ){
     LazyColumn(
         modifier = modifier
     ) {
-        items(posts) {post ->
+        items(postsWithUsers) { postWithUser ->
             FeedPost(
-                post = post,
+                post = postWithUser.post,
+                user = postWithUser.user,
                 onPostOptionClicked = onPostOptionClicked,
                 isUserPost = isUserPosts,
             )

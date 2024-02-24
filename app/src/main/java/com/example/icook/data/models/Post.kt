@@ -15,6 +15,11 @@ data class Post(
     val picture: String = "",
     val date: LocalDateTime = LocalDateTime.now(),
 )
+
+data class PostWithUser(
+    val post: Post,
+    val user: User,
+)
 enum class UserPostOptions{
     Delete,
 }
