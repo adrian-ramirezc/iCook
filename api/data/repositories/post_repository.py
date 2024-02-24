@@ -25,11 +25,19 @@ class PostRepository:
         return success
 
     def get_by_username(self, username: str) -> List[Post]:
-        stmt = select(Post).where(Post.username == username)
+        stmt = select(Post).where(Post.username == username).order_by(Post.date)
         result = self.db_session.execute(stmt)
         posts = result.scalars().all()
         if not posts:
             logger.debug(f"No posts found for User(username={username})")
+        return posts
+
+    def get_for_username(self, username: str) -> List[Post]:
+        stmt = select(Post).where(Post.username != username).order_by(Post.date)
+        result = self.db_session.execute(stmt)
+        posts = result.scalars().all()
+        if not posts:
+            logger.debug(f"No feed posts found for User(username={username})")
         return posts
 
     def delete(self, id: int) -> bool:

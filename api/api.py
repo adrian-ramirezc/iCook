@@ -38,6 +38,7 @@ post_model = api.model(
         "username": fields.String(example="aramirez"),
         "description": fields.String(example="Hello, check out my new post!"),
         "picture": fields.String(example="/path/to/picture"),
+        "date": fields.String(example="2024-02-24 15:11:22.454366"),
     },
 )
 
@@ -116,6 +117,14 @@ class PostsResource(Resource):
     @api.marshal_with(post_model)
     def get(self, username):
         posts = post_service.get_by_username(username=username)
+        return posts, HTTPStatus.OK
+
+
+@api.route("/posts/feed/<username>")
+class PostsResource(Resource):
+    @api.marshal_with(post_model)
+    def get(self, username):
+        posts = post_service.get_for_username(username=username)
         return posts, HTTPStatus.OK
 
 
