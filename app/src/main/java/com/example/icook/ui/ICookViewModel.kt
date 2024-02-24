@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import java.time.LocalDateTime
 
 
 const val TAG = "ICookViewModel"
@@ -336,7 +337,8 @@ class ICookViewModel : ViewModel() {
                 var post = Post(
                     username = userState.value.username,
                     description = newRawPostState.value.description,
-                    picture = picture!!
+                    picture = picture!!,
+                    date = LocalDateTime.now()
                 )
                 setIsValidatingNewPost(value = true)
                 val response = createPost(post)
@@ -398,9 +400,9 @@ class ICookViewModel : ViewModel() {
         switchTo(navController, ICookScreen.Profile)
     }
 
-    fun switchToHome(navController: NavHostController){
+    private fun fetchFeedPosts(){
         viewModelScope.launch{
-            var postsResponse = getFeedPosts(username = userState.value.username) // TODO: Get posts from followings!
+            var postsResponse = getFeedPosts(username = userState.value.username)
             if (postsResponse.isSuccessful) {
                 var posts = postsResponse.body()
                 _uiState.update {
@@ -410,6 +412,10 @@ class ICookViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun switchToHome(navController: NavHostController){
+        fetchFeedPosts()
         switchTo(navController, ICookScreen.Home)
     }
 
@@ -418,7 +424,7 @@ class ICookViewModel : ViewModel() {
     }
 
     private suspend fun getFeedPosts(username: String): Response<List<Post>> = withContext(Dispatchers.IO) {
-        return@withContext ICookApi.retrofitService.getUserPosts(username)
+        return@withContext ICookApi.retrofitService.getFeedPosts(username)
     }
 
     fun onPostOptionClicked(post: Post, postOption: UserPostOptions){

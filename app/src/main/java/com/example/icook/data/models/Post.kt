@@ -1,6 +1,7 @@
 package com.example.icook.data.models
 
 import android.net.Uri
+import java.time.LocalDateTime
 
 data class RawPost(
     val uri: Uri = Uri.parse(""),
@@ -12,6 +13,7 @@ data class Post(
     val username: String = "",
     val description: String = "",
     val picture: String = "",
+    val date: LocalDateTime = LocalDateTime.now(),
 )
 enum class UserPostOptions{
     Delete,

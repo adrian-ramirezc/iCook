@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.example.icook.R
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.UserPostOptions
+import com.example.icook.utils.getAge
 import com.example.icook.utils.loadImageFromBase64
 
 @Composable
@@ -137,13 +138,10 @@ fun FeedPost(
             )
         }
         Text(
-            text = "Posted at 12/12/12",
+            text = "Posted ${getAge(post.date)}",
             modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
         )
-
-
     }
-
 }
 
 @Composable
