@@ -49,8 +49,7 @@ import com.example.icook.utils.loadImageFromBase64
 @Composable
 fun ProfileScreen(
     user: User = User(),
-    posts_counter: Int = 15,
-    likes_counter: Int = 30,
+    likes_counter: Int = 0,
     posts: List<Post> = listOf(),
     onHomeButtonClicked: () -> Unit = {},
     onCreatePostButtonClicked: () -> Unit = {},
@@ -118,7 +117,7 @@ fun ProfileScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                Text(text = "$posts_counter")
+                Text(text = "${posts.size}")
                 Text(text = "posts")
             }
             Column(
