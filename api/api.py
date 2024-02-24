@@ -39,7 +39,6 @@ post_model = api.model(
         "picture": fields.String(example="/path/to/picture"),
     },
 )
-posts_model = api.model("Posts Model", {"posts": fields.List(fields.Nested(post_model))})
 
 message_model = api.model(
     "Message",
@@ -113,11 +112,11 @@ class PostsCreate(Resource):
 
 @api.route("/posts/<username>")
 class PostsResource(Resource):
-    @api.marshal_with(posts_model)
+    @api.marshal_with(post_model)
     def get(self, username):
         posts = post_service.get_by_username(username=username)
         status_code = HTTPStatus.OK if posts else HTTPStatus.NOT_FOUND
-        return {"posts": posts}, status_code
+        return posts, status_code
 
 
 if __name__ == "__main__":
