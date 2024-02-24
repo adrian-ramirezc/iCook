@@ -19,6 +19,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -116,19 +117,16 @@ fun FeedPost(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ){
-            Icon(
-                Icons.Outlined.Favorite,
-                contentDescription = null,
-                modifier = Modifier.padding(end = 20.dp))
-            Icon(Icons.Outlined.Create, contentDescription = null)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Icon(Icons.Outlined.Star, contentDescription = null)
+            IconToggleButton(checked = true, onCheckedChange = {}) {
+                Icon(
+                    Icons.Outlined.Favorite,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 20.dp))
             }
+            Icon(Icons.Outlined.Create, contentDescription = null)
         }
         Text(
             text = "999 likes",
