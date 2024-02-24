@@ -43,6 +43,9 @@ interface ICookApiService {
 
     @POST("posts/create")
     suspend fun createPost(@Body requestBody: Post): Response<SimpleMessage>
+
+    @GET("posts/{username}")
+    suspend fun getUserPosts(@Path("username") username: String): Response<List<Post>>
 }
 
 

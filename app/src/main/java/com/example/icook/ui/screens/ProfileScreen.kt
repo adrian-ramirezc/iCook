@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -35,6 +33,7 @@ import com.example.icook.R
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.User
 import com.example.icook.ui.components.BottomNavigationBar
+import com.example.icook.ui.components.FeedPostList
 
 @Composable
 fun ProfileScreen(
@@ -135,17 +134,21 @@ fun ProfileScreen(
             text = "Your Posts",
             modifier = Modifier.padding(15.dp)
         )
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 96.dp),
-            modifier = Modifier.weight(1f)
-        ){
-            items(18) {Image(
-                painter = painterResource(id = R.drawable.default_post),
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop,
-            )}
-        }
+        FeedPostList(
+            modifier = Modifier.weight(1f),
+            posts = posts
+        )
+        //LazyVerticalGrid(
+        //    columns = GridCells.Adaptive(minSize = 96.dp),
+        //    modifier = Modifier.weight(1f)
+        //){
+        //    items(18) {Image(
+          //      painter = painterResource(id = R.drawable.default_post),
+            //    contentDescription = null,
+              //  modifier = Modifier.fillMaxWidth(),
+                //contentScale = ContentScale.Crop,
+           // )}
+        //}
         BottomNavigationBar(
             onHomeButtonClicked = onHomeButtonClicked,
             onCreatePostButtonClicked = onCreatePostButtonClicked,

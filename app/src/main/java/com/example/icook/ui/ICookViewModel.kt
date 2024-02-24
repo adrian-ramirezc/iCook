@@ -4,8 +4,6 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -247,7 +245,7 @@ class ICookViewModel : ViewModel() {
                 Log.d(TAG, "User found")
                 if (verifyPassword(user.password, userResponse.body()!!.password)) {
                     _userState.update { userResponse.body()!!.copy(password = "") } // Do not expose user password
-                    switchToHome(navController)
+                    switchToHome(navController=navController)
                 } else {
                     showSnackbarMessage(message = "Wrong Password")
                     Log.d(TAG, "Incorrect Password")
@@ -269,7 +267,7 @@ class ICookViewModel : ViewModel() {
                 Log.d(TAG, "Username is available")
                 val createResponse = createUser(user = userState.value)
                 if (createResponse.isSuccessful) {
-                    switchToHome(navController)
+                    switchToHome(navController=navController)
                 } else {
                     Log.e(TAG, "User was not created: $createResponse")
                 }
@@ -381,4 +379,41 @@ class ICookViewModel : ViewModel() {
         return@withContext ICookApi.retrofitService.updateUser(userToUpdate)
     }
 
+    fun switchToProfile(navController: NavHostController){
+        viewModelScope.launch{
+            var postsResponse = getUserPosts(username = userState.value.username)
+            if (postsResponse.isSuccessful) {
+                var posts = postsResponse.body()
+                _uiState.update {
+                    it.copy(
+                        userPosts = posts!!
+                    )
+                }
+            }
+        }
+        switchTo(navController, ICookScreen.Profile)
+    }
+
+    fun switchToHome(navController: NavHostController){
+        viewModelScope.launch{
+            var postsResponse = getFeedPosts(username = userState.value.username) // TODO: Get posts from followings!
+            if (postsResponse.isSuccessful) {
+                var posts = postsResponse.body()
+                _uiState.update {
+                    it.copy(
+                        feedPosts = posts!!
+                    )
+                }
+            }
+        }
+        switchTo(navController, ICookScreen.Home)
+    }
+
+    private suspend fun getUserPosts(username: String): Response<List<Post>> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.getUserPosts(username)
+    }
+
+    private suspend fun getFeedPosts(username: String): Response<List<Post>> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.getUserPosts(username)
+    }
 }

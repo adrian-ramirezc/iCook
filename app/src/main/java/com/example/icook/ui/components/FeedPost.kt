@@ -1,15 +1,17 @@
 package com.example.icook.ui.components
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
@@ -19,32 +21,50 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.R
-import com.example.icook.data.Post
+import com.example.icook.data.models.Post
+import com.example.icook.utils.loadImageFromBase64
 
 @Composable
 fun FeedPost(
     post : Post = Post(),
     modifier : Modifier = Modifier,
 ) {
+    var context = LocalContext.current
     Column(
         modifier = modifier
     ){
         Row(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Outlined.AccountBox, contentDescription = null)
+            Image(
+                painter = painterResource(id = R.drawable.default_user),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+            )
             Text(
-                text = "@${post.author.username}",
-                modifier = Modifier.align(Alignment.Top)
+                text = "@${post.username}",
+                modifier = Modifier.padding(start=5.dp)
             )
         }
         Image(
-            painter = painterResource(id = R.drawable.ceviche),
+            painter = if (post.picture != "") {
+                loadImageFromBase64(base64Image = post.picture, context = context)
+            } else {
+                painterResource(id = R.drawable.default_post)
+                   },
             contentDescription = null,
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.Crop,
@@ -67,11 +87,11 @@ fun FeedPost(
             }
         }
         Text(
-            text = "${post.likes_counter} likes",
+            text = "999 likes",
             modifier = Modifier.padding(start = 20.dp, bottom = 5.dp)
         )
         Text(
-            text = "@${post.author.username}: ${post.description}",
+            text = "@${post.username}: ${post.description}",
             modifier = Modifier.padding(start = 20.dp)
         )
         TextButton(onClick = { /*TODO*/ }) {
@@ -81,7 +101,7 @@ fun FeedPost(
             )
         }
         Text(
-            text = "Posted at ${post.date_created}",
+            text = "Posted at 12/12/12",
             modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
         )
 
@@ -107,5 +127,10 @@ fun FeedPostList(
 @Preview(showBackground = true)
 @Composable
 fun FeedPostComponentPreview() {
-    FeedPost()
+    FeedPost(
+        post = Post(
+            username = "aramirez",
+            description = "This is an awesome description"
+        )
+    )
 }

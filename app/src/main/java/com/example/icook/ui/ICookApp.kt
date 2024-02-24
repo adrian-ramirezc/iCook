@@ -4,13 +4,10 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -79,7 +76,8 @@ fun ICookApp(
             composable(route = ICookScreen.Home.name){
                 HomeScreen(
                     user = userState,
-                    onProfileButtonClicked = { switchTo(navController, ICookScreen.Profile)},
+                    feedPosts = uiState.feedPosts,
+                    onProfileButtonClicked = { viewModel.switchToProfile(navController=navController) },
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost) }
                 )
             }
@@ -90,15 +88,16 @@ fun ICookApp(
                     onDescriptionChange = {newValue -> viewModel.onDescriptionChange(newValue)},
                     updateNewRawPostUri = {uri: Uri? -> viewModel.updateNewRawPostUri(uri)},
                     onCreateNewPostClicked = {viewModel.onCreateNewPostClicked(contentResolver = contentResolver, navController = navController)},
-                    onHomeButtonClicked = { switchTo(navController, ICookScreen.Home) },
-                    onProfileButtonClicked = { switchTo(navController, ICookScreen.Profile) }
+                    onHomeButtonClicked = { viewModel.switchToHome(navController=navController)  },
+                    onProfileButtonClicked = {viewModel.switchToProfile(navController=navController) }
                 )
             }
             composable(route = ICookScreen.Profile.name) {
                 ProfileScreen(
                     user = userState,
+                    posts = uiState.userPosts,
                     onDescriptionTextFieldClicked = {newValue: String -> viewModel.onDescriptionTextFieldClicked(newValue)},
-                    onHomeButtonClicked = { switchTo(navController, ICookScreen.Home) },
+                    onHomeButtonClicked = { viewModel.switchToHome(navController=navController)  },
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost)},
                     persistNewUserDescription = {viewModel.persistNewUserDescription()}
                 )
@@ -114,13 +113,4 @@ fun switchTo(navController: NavHostController, screen: ICookScreen) {
     if (navController.currentBackStack.value[1].destination.route != screen.name) {
         navController.navigate(screen.name)
     }
-}
-
-@SuppressLint("RestrictedApi")
-fun switchToHome(navController: NavHostController) {
-    switchTo(navController, ICookScreen.Home)
-}
-
-fun switchToProfile(navController: NavHostController) {
-    switchTo(navController, ICookScreen.Profile)
 }

@@ -23,6 +23,7 @@ import com.example.icook.ui.components.FeedPostList
 fun HomeScreen(
     modifier: Modifier = Modifier,
     user : User = User(),
+    feedPosts: List<Post> = listOf<Post>(),
     onProfileButtonClicked: () -> Unit,
     onCreatePostButtonClicked: () -> Unit,
     ) {
@@ -47,7 +48,7 @@ fun HomeScreen(
         }
         FeedPostList(
             modifier = Modifier.weight(1f),
-            posts = listOf(Post(), Post(), Post(), Post())
+            posts = feedPosts,
         )
         BottomNavigationBar(
             onHomeButtonClicked = {},
@@ -64,5 +65,10 @@ fun HomeScreenPreview() {
     HomeScreen(
         onProfileButtonClicked = {},
         onCreatePostButtonClicked = {},
+        feedPosts = listOf(
+            Post(username = "wfrezaq"),
+            Post(username = "usertest"),
+            Post(username = "helloitsme")
+        )
     )
 }
