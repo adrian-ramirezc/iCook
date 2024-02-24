@@ -42,6 +42,8 @@ fun ICookApp(
         val newRawPostState by viewModel.newRawPostState.collectAsState()
         val formState by viewModel.formState.collectAsState()
         val uiState by viewModel.uiState.collectAsState()
+        val profileScreenState by viewModel.profileScreenSF.profileScreenState.collectAsState()
+
         val contentResolver = LocalContext.current.contentResolver
 
         NavHost(
@@ -96,11 +98,14 @@ fun ICookApp(
                 ProfileScreen(
                     user = userState,
                     posts = uiState.userPosts,
-                    onDescriptionTextFieldClicked = {newValue: String -> viewModel.onDescriptionTextFieldClicked(newValue)},
+                    snackbarHostState = uiState.snackbarHostState,
+                    userPictureScreenEnabled = profileScreenState.userPictureScreenEnabled,
+                    setUserPictureScreenEnabled = {value: Boolean -> viewModel.profileScreenSF.setUserPictureScreenEnabled(value)},
                     onHomeButtonClicked = { viewModel.switchToHome(navController=navController)  },
                     onCreatePostButtonClicked = { switchTo(navController, ICookScreen.CreatePost)},
-                    persistNewUserDescription = {viewModel.persistNewUserDescription()},
+                    persistNewUserDescription = {newDescription: String -> viewModel.persistNewUserDescription(newDescription)},
                     onPostOptionClicked = {post, postOption -> viewModel.onPostOptionClicked(post, postOption)},
+                    onUpdateUserPictureClicked = {uri: Uri? ->  viewModel.persistNewUserProfilePicture(uri = uri, contentResolver=contentResolver)}
                 )
             }
 

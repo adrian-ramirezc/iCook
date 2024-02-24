@@ -59,8 +59,8 @@ fun CreatePostScreen(
             Log.d("PhotoPicker", "No media selected")
         }
     }
-    var modifier = Modifier.fillMaxHeight().padding(top = 15.dp)
-    var validatingModifier = modifier.blur(5.dp)
+    val modifier = Modifier.fillMaxHeight().padding(top = 15.dp)
+    val validatingModifier = modifier.blur(5.dp)
 
     Column(
         modifier = if (newRawPostState.isValidating) {validatingModifier} else  {modifier},
@@ -112,7 +112,6 @@ fun CreatePostScreen(
                 maxLines = 3,
             )
         }
-        //Spacer(modifier = Modifier.size(128.dp))
         Button(
             onClick = {
                 pickMedia.launch(

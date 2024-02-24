@@ -1,5 +1,6 @@
 package com.example.icook.ui.screens
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,36 +26,45 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.example.icook.R
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.UserPostOptions
 import com.example.icook.data.models.User
 import com.example.icook.ui.components.BottomNavigationBar
 import com.example.icook.ui.components.FeedPostList
+import com.example.icook.ui.components.Snackbar
+import com.example.icook.ui.components.UpdateUserPicture
+import com.example.icook.utils.loadImageFromBase64
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
     user: User = User(),
     posts_counter: Int = 15,
     likes_counter: Int = 30,
     posts: List<Post> = listOf(),
-    onDescriptionTextFieldClicked: (String) -> Unit = {a: String ->},
     onHomeButtonClicked: () -> Unit = {},
     onCreatePostButtonClicked: () -> Unit = {},
-    persistNewUserDescription: () -> Unit = {},
-    onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->}
+    persistNewUserDescription: (newUserDescription: String ) -> Unit = {},
+    onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
+    onUpdateUserPictureClicked: (Uri?) -> Unit = {},
+    snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    userPictureScreenEnabled : Boolean = false,
+    setUserPictureScreenEnabled : (newValue : Boolean) -> Unit = {_ -> }
 ) {
-    var isDescriptionEnabled by remember { mutableStateOf<Boolean>(false) }
+    var descriptionEditingEnabled by remember { mutableStateOf<Boolean>(false) }
+    var userDescription by remember { mutableStateOf<String>(user.description) }
 
     Column(
-        modifier = modifier
+        modifier = if (userPictureScreenEnabled) {Modifier.blur(3.dp)} else {Modifier}
     ) {
         Text(
             text = "@${user.username}",
@@ -61,19 +73,29 @@ fun ProfileScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(15.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ){
-            Image(
-                painter = painterResource(id = R.drawable.default_user),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .border(1.dp, Color.DarkGray, CircleShape)
-            )
+            TextButton(
+                onClick = {
+                    setUserPictureScreenEnabled(true)
+                }
+            ) {
+                Image(
+                    painter = if (user.picture != "") {
+                        loadImageFromBase64(base64Image = user.picture, context = LocalContext.current)
+                    } else {
+                        painterResource(id = R.drawable.default_user)
+                    },
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.DarkGray, CircleShape)
+                )
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
@@ -98,29 +120,27 @@ fun ProfileScreen(
                 label = {Text(text = "${user.name} ${user.lastname}")},
                 modifier = Modifier.weight(0.8f),
                 maxLines = 3,
-                enabled = isDescriptionEnabled,
-                value = user.description,
+                enabled = descriptionEditingEnabled,
+                value = userDescription,
                 trailingIcon = {
                     IconToggleButton(
                         checked = true,
                         modifier = Modifier.weight(0.2f),
                         onCheckedChange = {checked ->
-                            isDescriptionEnabled = !isDescriptionEnabled
+                            descriptionEditingEnabled = !descriptionEditingEnabled
                             if (!checked) {
-                                persistNewUserDescription()
+                                persistNewUserDescription(userDescription)
                             }
                         }
                     ) {
                         Icon(
-                            if (isDescriptionEnabled) {Icons.Default.Check} else {Icons.Default.Create}
+                            if (descriptionEditingEnabled) {Icons.Default.Check} else {Icons.Default.Create}
                             , contentDescription = null
                         )
                         }},
-                        onValueChange ={newValue -> onDescriptionTextFieldClicked(newValue)}
+                onValueChange ={newValue -> userDescription  = newValue}
             )
-
         }
-
         Text(
             text = "Your Posts",
             modifier = Modifier.padding(start = 15.dp, top = 10.dp, bottom = 4.dp)
@@ -136,6 +156,15 @@ fun ProfileScreen(
             onCreatePostButtonClicked = onCreatePostButtonClicked,
         )
     }
+    if (userPictureScreenEnabled) {
+        UpdateUserPicture(
+            picture = user.picture,
+            onCloseButtonClicked = { setUserPictureScreenEnabled(false) },
+            onUpdateButtonClicked = { uri: Uri? -> onUpdateUserPictureClicked(uri)},
+        )
+    }
+    Snackbar(hostState = snackbarHostState)
+
 }
 
 @Preview(showBackground = true)

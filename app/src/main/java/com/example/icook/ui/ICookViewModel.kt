@@ -40,6 +40,22 @@ data class FormState(
     val isValidating: Boolean = false,
 )
 
+data class ProfileScreenState(
+    val userPictureScreenEnabled: Boolean = false,
+)
+class ProfileScreenStateFlow{
+    private val _profileScreenState = MutableStateFlow(ProfileScreenState())
+    val profileScreenState: StateFlow<ProfileScreenState> = _profileScreenState.asStateFlow()
+
+    fun setUserPictureScreenEnabled(value: Boolean) {
+        _profileScreenState.update {
+            it.copy(
+                userPictureScreenEnabled = value
+            )
+        }
+    }
+}
+
 class ICookViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ICookState())
     val uiState: StateFlow<ICookState> = _uiState.asStateFlow()
@@ -52,6 +68,8 @@ class ICookViewModel : ViewModel() {
 
     private val _formState = MutableStateFlow(FormState())
     val formState: StateFlow<FormState> = _formState.asStateFlow()
+
+    val profileScreenSF = ProfileScreenStateFlow()
 
     fun onUsernameChange(newUsername: String) {
         _userState.update {
@@ -357,17 +375,26 @@ class ICookViewModel : ViewModel() {
         return@withContext ICookApi.retrofitService.createPost(post)
     }
 
-    fun onDescriptionTextFieldClicked(newValue: String){
-        _userState.update {
-            it.copy(
-                description = newValue
-            )
+    fun persistNewUserDescription(newDescription: String){
+        viewModelScope.launch {
+            updateUser(username = userState.value.username, mapOf("description" to newDescription))
         }
     }
 
-    fun persistNewUserDescription(){
+    fun persistNewUserProfilePicture(uri: Uri?, contentResolver: ContentResolver){
         viewModelScope.launch {
-            updateUser(username = userState.value.username, mapOf("description" to userState.value.description))
+            if (uri == null) {
+                showSnackbarMessage(message = "No picture selected")
+            } else {
+                var picture = uriToBase64(uri=uri, contentResolver = contentResolver)
+                var responseUpdateUser = updateUser(username = userState.value.username, mapOf("picture" to picture!!))
+                if (responseUpdateUser.isSuccessful){
+                    profileScreenSF.setUserPictureScreenEnabled(false)
+                    fetchUser()
+                } else {
+                    showSnackbarMessage(message = "Picture was not updated")
+                }
+            }
         }
     }
 
@@ -377,9 +404,19 @@ class ICookViewModel : ViewModel() {
         for ((key, value) in keys) {
             when (key) {
                 "description" -> userToUpdate = userToUpdate.copy(description = value)
+                "picture" -> userToUpdate = userToUpdate.copy(picture = value)
             }
         }
         return@withContext ICookApi.retrofitService.updateUser(userToUpdate)
+    }
+
+    private fun fetchUser(){
+        viewModelScope.launch{
+            val responseUser = getUser(username = userState.value.username)
+            if (responseUser.isSuccessful) {
+                _userState.update {responseUser.body()!!}
+            }
+        }
     }
 
     private fun fetchUserPosts(){
