@@ -1,5 +1,6 @@
 package com.example.icook.network
 
+import com.example.icook.data.models.Comment
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.SimpleMessage
@@ -64,6 +65,12 @@ interface ICookApiService {
 
     @DELETE("posts/delete/{id}")
     suspend fun deletePost(@Path("id") id: Int): Response<SimpleMessage>
+
+    @POST("comments/create")
+    suspend fun createComment(@Body requestBody: Comment): Response<SimpleMessage>
+
+    @GET("comments/{post_id}")
+    suspend fun getCommentsByPostId(@Path("post_id") id: Int): Response<List<Comment>>
 }
 
 

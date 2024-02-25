@@ -5,8 +5,10 @@ from flask import Flask
 from flask_restx import Api, Resource, fields
 
 from data.database import db_session, init_db
+from data.repositories.comment_repository import CommentRepository
 from data.repositories.post_repository import PostRepository
 from data.repositories.user_repository import UserRepository
+from data.services.comment_service import CommentService
 from data.services.post_service import PostService
 from data.services.user_service import UserService
 
@@ -46,10 +48,21 @@ user_model_create = api.model(
 post_model = api.model(
     "Post Model",
     {
-        "id": fields.Integer(example="123456"),
+        "id": fields.Integer(example=123456),
         "username": fields.String(example="aramirez"),
         "description": fields.String(example="Hello, check out my new post!"),
-        "picture": fields.String(example="/path/to/picture"),
+        "picture": fields.String(example="encoded image"),
+        "date": fields.String(example="2024-02-24 15:11:22.454366"),
+    },
+)
+
+comment_model = api.model(
+    "Comment Model",
+    {
+        "id": fields.Integer(example=1111),
+        "username": fields.String(example="aramirez"),
+        "post_id": fields.Integer(example=12345),
+        "text": fields.String(example="This is a comment"),
         "date": fields.String(example="2024-02-24 15:11:22.454366"),
     },
 )
@@ -74,6 +87,9 @@ user_service = UserService(user_repository=user_repository)
 
 post_repository = PostRepository(db_session=db_session)
 post_service = PostService(post_repository=post_repository)
+
+comment_repository = CommentRepository(db_session=db_session)
+comment_service = CommentService(comment_repository=comment_repository)
 
 
 @app.teardown_appcontext
@@ -171,6 +187,28 @@ class PostDelete(Resource):
             if success
             else ({"message": "Post was not deleted"}, HTTPStatus.CONFLICT)
         )
+
+
+@api.route("/comments/create")
+class CommentsCreate(Resource):
+    @api.marshal_with(message_model)
+    @api.expect(comment_model)
+    def post(self):
+        comment_dict = api.payload
+        success = comment_service.create(comment_dict=comment_dict)
+        return (
+            ({"message": "Comment created"}, HTTPStatus.OK)
+            if success
+            else ({"message": "Comment was not created"}, HTTPStatus.CONFLICT)
+        )
+
+
+@api.route("/comments/<post_id>")
+class CommentsByPostIdResource(Resource):
+    @api.marshal_with(comment_model)
+    def get(self, post_id):
+        comments = comment_service.get_by_post_id(post_id=int(post_id))
+        return comments, HTTPStatus.OK
 
 
 if __name__ == "__main__":

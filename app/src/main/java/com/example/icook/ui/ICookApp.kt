@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.icook.data.models.Post
 import com.example.icook.data.models.User
 import com.example.icook.ui.screens.CreatePostScreen
 import com.example.icook.ui.screens.HomeScreen
@@ -81,9 +82,12 @@ fun ICookApp(
                 HomeScreen(
                     user = userState,
                     feedPostsWithUsers = uiState.feedPostsWithUsers,
+                    postsWithComments = uiState.postWithComments,
                     onProfileButtonClicked = { viewModel.switchToProfile(navController=navController) },
                     onCreatePostButtonClicked = { viewModel.switchTo(navController, ICookScreen.CreatePost) },
-                    onOtherUserPictureClicked = {otherUser: User -> viewModel.onOtherUserPictureClicked(navController=navController, otherUser=otherUser)}
+                    onOtherUserPictureClicked = {otherUser: User -> viewModel.onOtherUserPictureClicked(navController=navController, otherUser=otherUser)},
+                    onCreateNewCommentButtonClicked = {newCommentText: String, post: Post -> viewModel.onCreateNewCommentButtonClicked(newCommentText,post) },
+                    onViewAllCommentsClicked = {post: Post -> viewModel.onViewAllCommentsClicked(post)},
                 )
             }
             composable(route = ICookScreen.CreatePost.name) {
@@ -101,6 +105,7 @@ fun ICookApp(
                 ProfileScreen(
                     user = userState,
                     posts = uiState.userPosts,
+                    postsWithComments = uiState.postWithComments,
                     snackbarHostState = uiState.snackbarHostState,
                     userPictureScreenEnabled = profileScreenState.userPictureScreenEnabled,
                     setUserPictureScreenEnabled = {value: Boolean -> viewModel.profileScreenSF.setUserPictureScreenEnabled(value)},
@@ -109,18 +114,24 @@ fun ICookApp(
                     persistNewUserDescription = {newDescription: String -> viewModel.persistNewUserDescription(newDescription)},
                     onPostOptionClicked = {post, postOption -> viewModel.onPostOptionClicked(post, postOption)},
                     onUpdateUserPictureClicked = {uri: Uri? ->  viewModel.persistNewUserProfilePicture(uri = uri, contentResolver=contentResolver)},
-                    onLogOutButtonClicked = {viewModel.onLogOutButtonClicked(navController)}
-                )
+                    onLogOutButtonClicked = {viewModel.onLogOutButtonClicked(navController)},
+                    onCreateNewCommentButtonClicked = {newCommentText: String, post: Post -> viewModel.onCreateNewCommentButtonClicked(newCommentText,post) },
+                    onViewAllCommentsClicked = {post: Post -> viewModel.onViewAllCommentsClicked(post)},
+
+                    )
             }
             composable(route = ICookScreen.OtherProfile.name) {
                 ProfileScreen(
+                    isMyProfile = false,
                     user = otherProfileScreenState.user,
                     posts = otherProfileScreenState.userPosts,
+                    postsWithComments = uiState.postWithComments,
                     onHomeButtonClicked = { viewModel.switchToHome(navController=navController)  },
                     onCreatePostButtonClicked = { viewModel.switchTo(navController, ICookScreen.CreatePost)},
                     onProfileButtonClicked = {viewModel.switchToProfile(navController=navController) },
-                    isMyProfile = false,
-                )
+                    onCreateNewCommentButtonClicked = {newCommentText: String, post: Post -> viewModel.onCreateNewCommentButtonClicked(newCommentText,post) },
+                    onViewAllCommentsClicked = {post: Post -> viewModel.onViewAllCommentsClicked(post)},
+                    )
             }
 
         }

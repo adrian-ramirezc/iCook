@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.icook.ICookState
+import com.example.icook.data.models.Comment
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.RawPost
@@ -20,6 +21,7 @@ import com.example.icook.network.ICookApi
 import com.example.icook.utils.uriToBase64
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -502,6 +504,42 @@ class ICookViewModel : ViewModel() {
                 switchTo(navController = navController, screen = ICookScreen.OtherProfile)
             }
         }
+    }
+
+    fun onCreateNewCommentButtonClicked(newCommentText : String, post : Post) {
+        viewModelScope.launch {
+            val comment = Comment(username=userState.value.username, post_id = post.id, text = newCommentText)
+            val response = createComment(comment=comment)
+            if (!response.isSuccessful) {
+                showSnackbarMessage("Comment could not be created")
+            }
+        }
+    }
+
+    private suspend fun createComment(comment: Comment): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.createComment(comment)
+    }
+
+    fun onViewAllCommentsClicked(post: Post) {
+        viewModelScope.launch {
+            val response = getCommentsByPostId(post.id!!)
+            if (response.isSuccessful) {
+                val comments = response.body()
+                _uiState.update { state ->
+                    val updatedPostWithComments = state.postWithComments.toMutableMap()
+                    updatedPostWithComments[post] = comments!!
+                    state.copy(
+                        postWithComments = updatedPostWithComments
+                    )
+                }
+            } else {
+                showSnackbarMessage("Comments could not be retrieved")
+            }
+        }
+    }
+
+    private suspend fun getCommentsByPostId(id: Int): Response<List<Comment>> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.getCommentsByPostId(id)
     }
 
     fun onLogOutButtonClicked(navController: NavHostController){

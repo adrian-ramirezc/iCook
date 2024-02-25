@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.icook.R
+import com.example.icook.data.models.Comment
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.UserPostOptions
@@ -51,6 +53,7 @@ fun ProfileScreen(
     user: User = User(),
     likes_counter: Int = 0,
     posts: List<Post> = listOf(),
+    postsWithComments : Map<Post, List<Comment>> = mapOf(),
     onHomeButtonClicked: () -> Unit = {},
     onCreatePostButtonClicked: () -> Unit = {},
     onProfileButtonClicked: () -> Unit = {},
@@ -62,6 +65,8 @@ fun ProfileScreen(
     setUserPictureScreenEnabled : (newValue : Boolean) -> Unit = {_ -> },
     onLogOutButtonClicked: () -> Unit = {},
     isMyProfile: Boolean = true,
+    onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ ->},
+    onViewAllCommentsClicked: (Post) -> Unit = {_ ->}
 ) {
     var descriptionEditingEnabled by remember { mutableStateOf<Boolean>(false) }
     var userDescription by remember { mutableStateOf<String>(user.description?: "Description not found") }
@@ -146,7 +151,7 @@ fun ProfileScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
+            OutlinedTextField(
                 label = {Text(text = "${user.name} ${user.lastname}")},
                 modifier = Modifier.weight(0.8f),
                 maxLines = 3,
@@ -183,6 +188,9 @@ fun ProfileScreen(
             postsWithUsers = posts.map{ post -> PostWithUser(post = post, user = user) },
             onPostOptionClicked = onPostOptionClicked,
             isUserPosts = isMyProfile,
+            onCreateNewCommentButtonClicked = onCreateNewCommentButtonClicked,
+            onViewAllCommentsClicked = onViewAllCommentsClicked,
+            postsWithComments = postsWithComments,
         )
         BottomNavigationBar(
             onHomeButtonClicked = onHomeButtonClicked,

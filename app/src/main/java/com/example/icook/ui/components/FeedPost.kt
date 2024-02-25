@@ -12,13 +12,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,7 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.icook.R
+import com.example.icook.data.models.Comment
 import com.example.icook.data.models.Post
 import com.example.icook.data.models.PostWithUser
 import com.example.icook.data.models.User
@@ -46,13 +50,29 @@ import com.example.icook.utils.loadImageFromBase64
 fun FeedPost(
     post : Post = Post(),
     user: User = User(),
+    comments : List<Comment> = listOf(),
     onOtherUserPictureClicked: (user: User) -> Unit = { _ -> },
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ -> },
     isUserPost: Boolean = false,
+    onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ ->},
+    onViewAllCommentsClicked: (Post) -> Unit = {_ ->}
 ) {
     var dropMenuExpanded by remember {
         mutableStateOf(false)
     }
+
+    var writeNewCommentEnabled by remember {
+        mutableStateOf(false)
+    }
+
+    var commentText by remember {
+        mutableStateOf("")
+    }
+
+    var showComments by remember {
+        mutableStateOf(false)
+    }
+
     Column {
         Row(
             modifier = Modifier
@@ -63,11 +83,14 @@ fun FeedPost(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                ){
+            ) {
                 TextButton(onClick = { onOtherUserPictureClicked(user) }) {
                     Image(
                         painter = if (user.picture != "") {
-                            loadImageFromBase64(base64Image = user.picture, context = LocalContext.current)
+                            loadImageFromBase64(
+                                base64Image = user.picture,
+                                context = LocalContext.current
+                            )
                         } else {
                             painterResource(id = R.drawable.default_user)
                         },
@@ -80,7 +103,7 @@ fun FeedPost(
                 }
                 Text(
                     text = "@${post.username}",
-                    modifier = Modifier.padding(start=5.dp)
+                    modifier = Modifier.padding(start = 5.dp)
                 )
             }
 
@@ -111,43 +134,109 @@ fun FeedPost(
                 loadImageFromBase64(base64Image = post.picture, context = LocalContext.current)
             } else {
                 painterResource(id = R.drawable.default_post)
-                   },
+            },
             contentDescription = null,
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.Crop,
         )
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            IconToggleButton(checked = true, onCheckedChange = {}) {
-                Icon(
-                    Icons.Outlined.Favorite,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 20.dp))
+                .padding(15.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconToggleButton(checked = true, onCheckedChange = {}) {
+                    Icon(
+                        Icons.Outlined.Favorite,
+                        contentDescription = null,
+                    )
+                }
+                IconToggleButton(
+                    checked = writeNewCommentEnabled,
+                    onCheckedChange = { writeNewCommentEnabled = true }
+                ) {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        contentDescription = null,
+                    )
+                }
             }
-            Icon(Icons.Outlined.Create, contentDescription = null)
-        }
-        Text(
-            text = "999 likes",
-            modifier = Modifier.padding(start = 20.dp, bottom = 5.dp)
-        )
-        Text(
-            text = "@${post.username}: ${post.description}",
-            modifier = Modifier.padding(start = 20.dp)
-        )
-        TextButton(onClick = { /*TODO*/ }) {
             Text(
-                text = "View all comments",
-                modifier = Modifier.padding(start = 10.dp)
+                text = "0 likes",
             )
+            Text(
+                text = "@${post.username}: ${post.description}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp)
+            )
+            if (writeNewCommentEnabled) {
+                OutlinedTextField(
+                    value = commentText,
+                    placeholder = { Text(text = "Add your comment here") },
+                    onValueChange = {value : String -> commentText = value},
+                    trailingIcon = {
+                        TextButton(
+                            onClick = {
+                                writeNewCommentEnabled = false
+                                onCreateNewCommentButtonClicked(commentText, post)
+                                commentText = ""
+                                showComments = false
+                            }
+                        ) {
+                            Icon(Icons.Outlined.Send, contentDescription = null)
+                        }
+                                   },
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth()
+                )
+            }
+            if (showComments) {
+                if (comments.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier.padding(start = 5.dp)
+                    ) {
+                        for (comment in comments) {
+                            Row {
+                                Text(
+                                    text = "@${comment.username}: ",
+                                    fontSize = 12.sp,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                                )
+                                Text(
+                                    text = comment.text!!,
+                                    fontSize = 12.sp,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                                )
+                            }
+
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "There are no comments yet",
+                        fontSize = 12.sp,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        )
+                }
+            }
+            TextButton(
+                onClick = {
+                    onViewAllCommentsClicked(post)
+                    showComments = !showComments
+                          },
+            ) {
+                Text( text = if (!showComments) {"View all comments"} else {"Hide all comments"})
+            }
+            Text( text = "Posted ${getAge(post.date)}")
         }
-        Text(
-            text = "Posted ${getAge(post.date)}",
-            modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
-        )
     }
 }
 
@@ -155,9 +244,12 @@ fun FeedPost(
 fun FeedPostList(
     modifier : Modifier = Modifier,
     postsWithUsers: List<PostWithUser> = listOf(),
+    postsWithComments : Map<Post, List<Comment>> = mapOf(),
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
     isUserPosts: Boolean = false,
     onOtherUserPictureClicked: (user: User) -> Unit = {},
+    onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ ->},
+    onViewAllCommentsClicked: (Post) -> Unit = {_ ->}
 ){
     LazyColumn(
         modifier = modifier
@@ -169,6 +261,9 @@ fun FeedPostList(
                 onOtherUserPictureClicked = { user: User -> onOtherUserPictureClicked(user) },
                 onPostOptionClicked = onPostOptionClicked,
                 isUserPost = isUserPosts,
+                onCreateNewCommentButtonClicked = onCreateNewCommentButtonClicked,
+                onViewAllCommentsClicked = onViewAllCommentsClicked,
+                comments = postsWithComments[postWithUser.post]?: listOf()
             )
         }
     }
@@ -183,5 +278,9 @@ fun FeedPostComponentPreview() {
             description = "This is an awesome description"
         ),
         isUserPost = true,
+        comments = listOf(
+            Comment(username = "aramirez", text="It looks delicious"),
+            Comment(username = "fjordan", text="Amazing!")
+        )
     )
 }

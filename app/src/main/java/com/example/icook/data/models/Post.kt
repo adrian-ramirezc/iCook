@@ -20,6 +20,7 @@ data class PostWithUser(
     val post: Post,
     val user: User,
 )
+
 enum class UserPostOptions{
     Delete,
 }
