@@ -9,8 +9,8 @@ from data.database import Base
 class Comment(Base):
     __tablename__ = "comments"
     id = Column(Integer, primary_key=True)
-    username = Column(String, ForeignKey("users.username"), nullable=False)
-    post_id = Column(Integer, ForeignKey("posts.id"), nullable=False)
+    username = Column(String, ForeignKey("users.username", ondelete="cascade"), nullable=False)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="cascade"), nullable=False)
     text = Column(String, nullable=False)
     date = Column(DateTime)
 
