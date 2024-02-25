@@ -25,7 +25,7 @@ class PostRepository:
         return success
 
     def get_by_username(self, username: str) -> List[Post]:
-        stmt = select(Post).where(Post.username == username).order_by(Post.date)
+        stmt = select(Post).where(Post.username == username).order_by(Post.date.desc())
         result = self.db_session.execute(stmt)
         posts = result.scalars().all()
         if not posts:
@@ -33,7 +33,7 @@ class PostRepository:
         return posts
 
     def get_for_username(self, username: str) -> List[Post]:
-        stmt = select(Post).where(Post.username != username).order_by(Post.date)
+        stmt = select(Post).where(Post.username != username).order_by(Post.date.desc())
         result = self.db_session.execute(stmt)
         posts = result.scalars().all()
         if not posts:
