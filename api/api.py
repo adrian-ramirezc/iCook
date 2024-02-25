@@ -53,6 +53,7 @@ post_model = api.model(
         "description": fields.String(example="Hello, check out my new post!"),
         "picture": fields.String(example="encoded image"),
         "date": fields.String(example="2024-02-24 15:11:22.454366"),
+        "liked_by": fields.List(fields.String, example=["aramirez", "testuser"]),
     },
 )
 
@@ -186,6 +187,30 @@ class PostDelete(Resource):
             ({"message": "Post deleted"}, HTTPStatus.OK)
             if success
             else ({"message": "Post was not deleted"}, HTTPStatus.CONFLICT)
+        )
+
+
+@api.route("/posts/likes/append/<id>/<username>", methods=["PUT"])
+class PostsIncreaseLikesCounter(Resource):
+    @api.marshal_with(message_model)
+    def put(self, id, username):
+        success = post_service.append_user_to_liked_by(id=int(id), username=username)
+        return (
+            ({"message": f"User {username} added to Post {id} likes"}, HTTPStatus.OK)
+            if success
+            else ({"message": "Operation failed"}, HTTPStatus.CONFLICT)
+        )
+
+
+@api.route("/posts/likes/pop/<id>/<username>", methods=["PUT"])
+class PostsDecreaseLikesCounter(Resource):
+    @api.marshal_with(message_model)
+    def put(self, id, username):
+        success = post_service.pop_user_from_liked_by(id=int(id), username=username)
+        return (
+            ({"message": f"User {username} removed from Post {id} likes"}, HTTPStatus.OK)
+            if success
+            else ({"message": "Operation failed"}, HTTPStatus.CONFLICT)
         )
 
 

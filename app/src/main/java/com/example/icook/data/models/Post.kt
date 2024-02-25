@@ -13,7 +13,8 @@ data class Post(
     val username: String = "",
     val description: String = "",
     val picture: String = "",
-    val date: LocalDateTime = LocalDateTime.now(),
+    val date: LocalDateTime? = null,
+    val liked_by: List<String> = listOf(),
 )
 
 data class PostWithUser(

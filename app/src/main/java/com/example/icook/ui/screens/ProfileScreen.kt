@@ -51,7 +51,6 @@ import com.example.icook.utils.loadImageFromBase64
 @Composable
 fun ProfileScreen(
     user: User = User(),
-    likes_counter: Int = 0,
     posts: List<Post> = listOf(),
     postsWithComments : Map<Post, List<Comment>> = mapOf(),
     onHomeButtonClicked: () -> Unit = {},
@@ -66,7 +65,8 @@ fun ProfileScreen(
     onLogOutButtonClicked: () -> Unit = {},
     isMyProfile: Boolean = true,
     onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ ->},
-    onViewAllCommentsClicked: (Post) -> Unit = {_ ->}
+    onViewAllCommentsClicked: (Post) -> Unit = {_ ->},
+    onLikePostClicked: (Int, Boolean) -> Unit = {_,_->},
 ) {
     var descriptionEditingEnabled by remember { mutableStateOf<Boolean>(false) }
     var userDescription by remember { mutableStateOf<String>(user.description?: "Description not found") }
@@ -139,7 +139,11 @@ fun ProfileScreen(
                     modifier = Modifier.padding(15.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "$likes_counter")
+                    var likesCounter = 0
+                    for (post in posts) {
+                        likesCounter += post.liked_by.size
+                    }
+                    Text(text = "$likesCounter")
                     Text(text = "likes")
                 }
             }
@@ -185,12 +189,14 @@ fun ProfileScreen(
         )
         FeedPostList(
             modifier = Modifier.weight(1f),
+            loggedInUser = user,
             postsWithUsers = posts.map{ post -> PostWithUser(post = post, user = user) },
             onPostOptionClicked = onPostOptionClicked,
             isUserPosts = isMyProfile,
             onCreateNewCommentButtonClicked = onCreateNewCommentButtonClicked,
             onViewAllCommentsClicked = onViewAllCommentsClicked,
             postsWithComments = postsWithComments,
+            onLikePostClicked=onLikePostClicked,
         )
         BottomNavigationBar(
             onHomeButtonClicked = onHomeButtonClicked,

@@ -88,6 +88,7 @@ fun ICookApp(
                     onOtherUserPictureClicked = {otherUser: User -> viewModel.onOtherUserPictureClicked(navController=navController, otherUser=otherUser)},
                     onCreateNewCommentButtonClicked = {newCommentText: String, post: Post -> viewModel.onCreateNewCommentButtonClicked(newCommentText,post) },
                     onViewAllCommentsClicked = {post: Post -> viewModel.onViewAllCommentsClicked(post)},
+                    onLikePostClicked = {postId: Int, isPostLiked: Boolean -> viewModel.onLikePostClicked(postId, isPostLiked)}
                 )
             }
             composable(route = ICookScreen.CreatePost.name) {
@@ -117,7 +118,7 @@ fun ICookApp(
                     onLogOutButtonClicked = {viewModel.onLogOutButtonClicked(navController)},
                     onCreateNewCommentButtonClicked = {newCommentText: String, post: Post -> viewModel.onCreateNewCommentButtonClicked(newCommentText,post) },
                     onViewAllCommentsClicked = {post: Post -> viewModel.onViewAllCommentsClicked(post)},
-
+                    onLikePostClicked = {postId: Int, isPostLiked: Boolean -> viewModel.onLikePostClicked(postId, isPostLiked)}
                     )
             }
             composable(route = ICookScreen.OtherProfile.name) {
@@ -131,7 +132,8 @@ fun ICookApp(
                     onProfileButtonClicked = {viewModel.switchToProfile(navController=navController) },
                     onCreateNewCommentButtonClicked = {newCommentText: String, post: Post -> viewModel.onCreateNewCommentButtonClicked(newCommentText,post) },
                     onViewAllCommentsClicked = {post: Post -> viewModel.onViewAllCommentsClicked(post)},
-                    )
+                    onLikePostClicked = {postId: Int, isPostLiked: Boolean -> viewModel.onLikePostClicked(postId, isPostLiked)}
+                )
             }
 
         }

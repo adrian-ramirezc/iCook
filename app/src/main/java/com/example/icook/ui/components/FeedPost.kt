@@ -48,6 +48,7 @@ import com.example.icook.utils.loadImageFromBase64
 
 @Composable
 fun FeedPost(
+    loggedInUser: User = User(),
     post : Post = Post(),
     user: User = User(),
     comments : List<Comment> = listOf(),
@@ -55,7 +56,8 @@ fun FeedPost(
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ -> },
     isUserPost: Boolean = false,
     onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ ->},
-    onViewAllCommentsClicked: (Post) -> Unit = {_ ->}
+    onViewAllCommentsClicked: (Post) -> Unit = {_ ->},
+    onLikePostClicked: (Int, Boolean) -> Unit = {_,_->}
 ) {
     var dropMenuExpanded by remember {
         mutableStateOf(false)
@@ -71,6 +73,13 @@ fun FeedPost(
 
     var showComments by remember {
         mutableStateOf(false)
+    }
+
+    var isPostLiked by remember {
+        mutableStateOf(loggedInUser.username in post.liked_by)
+    }
+    var likesCounter by remember {
+        mutableStateOf(post.liked_by.size)
     }
 
     Column {
@@ -151,7 +160,15 @@ fun FeedPost(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                IconToggleButton(checked = true, onCheckedChange = {}) {
+                IconToggleButton(
+                    checked = isPostLiked,
+                    onCheckedChange = {
+                        isPostLiked = !isPostLiked
+                        onLikePostClicked(post.id!!, isPostLiked)
+                        val increment = if (isPostLiked) {1} else {-1}
+                        likesCounter += increment
+                    }
+                ) {
                     Icon(
                         Icons.Outlined.Favorite,
                         contentDescription = null,
@@ -168,7 +185,7 @@ fun FeedPost(
                 }
             }
             Text(
-                text = "0 likes",
+                text = "$likesCounter likes",
             )
             Text(
                 text = "@${post.username}: ${post.description}",
@@ -235,7 +252,7 @@ fun FeedPost(
             ) {
                 Text( text = if (!showComments) {"View all comments"} else {"Hide all comments"})
             }
-            Text( text = "Posted ${getAge(post.date)}")
+            Text( text = "Posted ${getAge(post.date!!)}")
         }
     }
 }
@@ -245,11 +262,13 @@ fun FeedPostList(
     modifier : Modifier = Modifier,
     postsWithUsers: List<PostWithUser> = listOf(),
     postsWithComments : Map<Post, List<Comment>> = mapOf(),
+    loggedInUser: User = User(),
     onPostOptionClicked: (Post, UserPostOptions) -> Unit = { _, _ ->},
     isUserPosts: Boolean = false,
     onOtherUserPictureClicked: (user: User) -> Unit = {},
     onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ ->},
-    onViewAllCommentsClicked: (Post) -> Unit = {_ ->}
+    onViewAllCommentsClicked: (Post) -> Unit = {_ ->},
+    onLikePostClicked: (Int, Boolean) -> Unit = {_,_->}
 ){
     LazyColumn(
         modifier = modifier
@@ -258,12 +277,14 @@ fun FeedPostList(
             FeedPost(
                 post = postWithUser.post,
                 user = postWithUser.user,
+                loggedInUser = loggedInUser,
                 onOtherUserPictureClicked = { user: User -> onOtherUserPictureClicked(user) },
                 onPostOptionClicked = onPostOptionClicked,
                 isUserPost = isUserPosts,
                 onCreateNewCommentButtonClicked = onCreateNewCommentButtonClicked,
                 onViewAllCommentsClicked = onViewAllCommentsClicked,
-                comments = postsWithComments[postWithUser.post]?: listOf()
+                comments = postsWithComments[postWithUser.post]?: listOf(),
+                onLikePostClicked = onLikePostClicked,
             )
         }
     }
@@ -275,7 +296,8 @@ fun FeedPostComponentPreview() {
     FeedPost(
         post = Post(
             username = "aramirez",
-            description = "This is an awesome description"
+            description = "This is an awesome description",
+            liked_by = listOf("aramirez", "jro", "test_user"),
         ),
         isUserPost = true,
         comments = listOf(

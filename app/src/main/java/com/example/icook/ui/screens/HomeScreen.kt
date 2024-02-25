@@ -28,7 +28,8 @@ fun HomeScreen(
     onCreatePostButtonClicked: () -> Unit = {},
     onOtherUserPictureClicked: (user: User) -> Unit = {},
     onCreateNewCommentButtonClicked: (String, Post) -> Unit = {_,_ -> },
-    onViewAllCommentsClicked: (Post) -> Unit = { _ ->}
+    onViewAllCommentsClicked: (Post) -> Unit = { _ ->},
+    onLikePostClicked: (Int, Boolean) -> Unit = {_,_->}
     ) {
     Column(
         modifier = modifier,
@@ -47,10 +48,12 @@ fun HomeScreen(
         FeedPostList(
             modifier = Modifier.weight(1f),
             postsWithUsers = feedPostsWithUsers,
+            loggedInUser = user,
             onOtherUserPictureClicked = { user: User -> onOtherUserPictureClicked(user) },
             onCreateNewCommentButtonClicked = onCreateNewCommentButtonClicked,
             onViewAllCommentsClicked = onViewAllCommentsClicked,
             postsWithComments = postsWithComments,
+            onLikePostClicked=onLikePostClicked,
         )
         BottomNavigationBar(
             onHomeButtonClicked = {},

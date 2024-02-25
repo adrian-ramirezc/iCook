@@ -374,7 +374,6 @@ class ICookViewModel : ViewModel() {
                     username = userState.value.username,
                     description = newRawPostState.value.description,
                     picture = picture!!,
-                    date = LocalDateTime.now()
                 )
                 setIsValidatingNewPost(value = true)
                 val response = createPost(post)
@@ -540,6 +539,26 @@ class ICookViewModel : ViewModel() {
 
     private suspend fun getCommentsByPostId(id: Int): Response<List<Comment>> = withContext(Dispatchers.IO) {
         return@withContext ICookApi.retrofitService.getCommentsByPostId(id)
+    }
+
+    fun onLikePostClicked(postId: Int, isPostLiked: Boolean) {
+        viewModelScope.launch {
+            val response = if (isPostLiked) {
+               increasePostLikesCounter(postId, userState.value.username)
+            } else {
+               decreasePostLikesCounter(postId, userState.value.username)
+            }
+            if (!response.isSuccessful) {
+                showSnackbarMessage("Post could not be liked/disliked")
+            }
+        }
+    }
+
+    private suspend fun increasePostLikesCounter(id: Int, username: String): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.increasePostLikesCounter(id = id, username = username)
+    }
+    private suspend fun decreasePostLikesCounter(id: Int, username: String): Response<SimpleMessage> = withContext(Dispatchers.IO) {
+        return@withContext ICookApi.retrofitService.decreasePostLikesCounter(id = id, username = username)
     }
 
     fun onLogOutButtonClicked(navController: NavHostController){

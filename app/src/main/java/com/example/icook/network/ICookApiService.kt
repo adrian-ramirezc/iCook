@@ -71,6 +71,12 @@ interface ICookApiService {
 
     @GET("comments/{post_id}")
     suspend fun getCommentsByPostId(@Path("post_id") id: Int): Response<List<Comment>>
+
+    @PUT("posts/likes/append/{id}/{username}")
+    suspend fun increasePostLikesCounter(@Path("id") id: Int, @Path("username") username: String) : Response<SimpleMessage>
+
+    @PUT("posts/likes/pop/{id}/{username}")
+    suspend fun decreasePostLikesCounter(@Path("id") id: Int, @Path("username") username: String) : Response<SimpleMessage>
 }
 
 
