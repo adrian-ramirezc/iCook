@@ -20,8 +20,8 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import java.time.LocalDateTime
 
-private const val BASE_URL = "http://192.168.8.168:5000"
-//private const val BASE_URL = "http://10.0.2.2:5000"
+//private const val BASE_URL = "http://192.168.8.168:5000"
+private const val BASE_URL = "http://10.0.2.2:5000"
 /**
  * when debugging/testing:
  *  - from emulator: "http://10.0.2.2:PORT_NUMBER"

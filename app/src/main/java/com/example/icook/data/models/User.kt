@@ -1,12 +1,12 @@
 package com.example.icook.data.models
 
 data class User(
-    val username: String = "aramirez",
+    val username: String = "",
     val name: String = "",
     val lastname: String = "",
     val description: String? = null,
     val picture: String = "",
-    val password: String = "qwe",
+    val password: String = "",
 )
 
 data class UserToUpdate(
