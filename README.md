@@ -14,7 +14,7 @@ A social media Android mobile application (design inspired by Instagram).
 
 
 ### Log In to iCook
-<div style="display: flex; justify-content: ;">
+<div style="display: flex; justify-content: space-around;">
   <img src="media/videos/LogInUserSuccess.gif" alt="LogInProcess" style="width:25%; height:auto;">
   <img src="media/screenshots/LogInFailed.png" alt="LogInFailed" style="width:25%; height:auto;">
 </div>
@@ -25,10 +25,10 @@ A social media Android mobile application (design inspired by Instagram).
 </div>
 
 ### Create a new post
-<div style="display: flex; justify-content: space-around;">
-  <img src="media/videos/CreateANewPost.gif" alt="CreateANewPostProcess" style="width:25%; height:auto;">
-  <img src="media/screenshots/NoDescriptionForNewPost.png" alt="NoDescriptionForNewPost" style="width:25%; height:auto;">
-  <img src="media/screenshots/NoPictureWasSelectedForNewPost.png" alt="NoPictureWasSelectedForNewPost" style="width:25%; height:auto;">
+<div style="display: flex; justify-content: space-around; height: 500px; width: auto">
+  <img src="media/videos/CreateANewPost.gif" alt="CreateANewPostProcess">
+  <img src="media/screenshots/NoDescriptionForNewPost.png" alt="NoDescriptionForNewPost">
+  <img src="media/screenshots/NoPictureWasSelectedForNewPost.png" alt="NoPictureWasSelectedForNewPost">
 </div>
 
 
