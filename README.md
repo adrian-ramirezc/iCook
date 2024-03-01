@@ -5,12 +5,52 @@ A social media Android mobile application (design inspired by Instagram).
 - Frontend: [Jetpack Compose](https://developer.android.com/jetpack/compose), Android's toolkit for building native UI
 - Backend: FlaskRESTX (REST API) and Postgresql (RDBMS)
 
-## User stories
-- Sign Up to iCook
-<video width="320" height="240" controls>
-  <source src="media/videos/SigningUpProcessSuccess.webm" type="video/webm">
-  Your browser does not support the video tag.
-</video>
+## Features
+### Sign Up to iCook
+<div style="display: flex; justify-content: space-around;">
+  <img src="media/videos/SigningUpProcessSuccess.gif" alt="SignUpProcess" style="width:25%; height:auto;">
+    <img src="media/screenshots/InvalidFormNoPasswordShortUsername.png" alt="InvalidFormNoPasswordShortUsername" style="width:25%; height:auto;">
+</div>
+
+
+### Log In to iCook
+<div style="display: flex; justify-content: ;">
+  <img src="media/videos/LogInUserSuccess.gif" alt="LogInProcess" style="width:25%; height:auto;">
+  <img src="media/screenshots/LogInFailed.png" alt="LogInFailed" style="width:25%; height:auto;">
+</div>
+
+### Update/Customizer your iCook profile
+<div style="display: flex; justify-content: center;">
+  <img src="media/videos/UpdateUserProfile.gif" alt="UpdatYourProfileProcess" style="width:25%; height:auto;">
+</div>
+
+### Create a new post
+<div style="display: flex; justify-content: space-around;">
+  <img src="media/videos/CreateANewPost.gif" alt="CreateANewPostProcess" style="width:25%; height:auto;">
+  <img src="media/screenshots/NoDescriptionForNewPost.png" alt="NoDescriptionForNewPost" style="width:25%; height:auto;">
+  <img src="media/screenshots/NoPictureWasSelectedForNewPost.png" alt="NoPictureWasSelectedForNewPost" style="width:25%; height:auto;">
+</div>
+
+
+### Check out your Feed Posts, Interact with other posts (like and comment)
+<div style="display: flex; justify-content: center;">
+  <img src="media/videos/HomePageReactingToPostsAndWritingComments.gif" alt="HomePageReactingToPostsAndWritingCommentsProcess" style="width:25%; height:auto;">
+</div>
+
+### Visit other user profiles
+<div style="display: flex; justify-content: center;">
+  <img src="media/videos/VisitingAnotherUserProfileAndReactingToPostWritingComments.gif" alt="VisitingAnotherUserProfileAndReactingToPostWritingCommentsProcess" style="width:25%; height:auto;">
+</div>
+
+### Let's log in as another user (aparedes12), check their profile and reply to comments in their posts
+<div style="display: flex; justify-content: center;">
+  <img src="media/videos/LogInAsAnotherUserAndReplyingToCommentInPost.gif" alt="LogInAsAnotherUserAndReplyingToCommentInPostProcess" style="width:25%; height:auto;">
+</div>
+
+### Let's log in as another user (aramirez), and check out their feed posts
+<div style="display: flex; justify-content: center;">
+  <img src="media/videos/CheckFeedAndProfile.gif" alt="CheckFeedAndProfileProcess" style="width:25%; height:auto;">
+</div>
 
 
 ## What I learned
@@ -42,25 +82,25 @@ Jetpack Compose is a modern toolkit for building native Android UI. Follow these
 
 
 ## TODO
-### Testing
+### 1. Testing
 
 - **Unit Testing**: Write unit tests for individual functions and classes to ensure they work as expected.
 - **UI Testing**: Use tools like Espresso for writing UI tests to ensure proper behavior of UI components.
 - **Mocking and Dependency Injection**: Utilize mocking frameworks and dependency injection to isolate components for testing.
 
-### Performance Optimization
+### 2. Performance Optimization
 
 - **Network Calls**: Optimize network calls by using techniques like caching, batching, and reducing unnecessary requests.
 
-### Continuous Integration and Deployment (CI/CD)
+### 3. Continuous Integration and Deployment (CI/CD)
 
 - **Automated Builds**: Set up CI/CD pipelines to automate builds, testing, and deployment processes.
 
-### Accessibility
+### 4. Accessibility
 
 - **Accessibility Features**: Ensure your app is accessible to users with disabilities by following accessibility guidelines and best practices.
 
-### Internationalization and Localization
+### 5. Internationalization and Localization
 
 - **Internationalization (i18n)**: Design your app to support multiple languages and cultures.
 
