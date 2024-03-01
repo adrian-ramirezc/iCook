@@ -8,8 +8,8 @@ A social media Android mobile application (design inspired by Instagram).
 ## Features
 ### Sign Up to iCook
 <div style="display: flex; justify-content: space-around;">
-  <img src="media/videos/SigningUpProcessSuccess.gif" alt="SignUpProcess" style="width:200px; height:auto;">
-  <img src="media/screenshots/InvalidFormNoPasswordShortUsername.png" alt="InvalidFormNoPasswordShortUsername" style="width:200px; height:auto;">
+  <img src="media/videos/SigningUpProcessSuccess.gif" alt="SignUpProcess" style="width:400px; height:auto;">
+  <img src="media/screenshots/InvalidFormNoPasswordShortUsername.png" alt="InvalidFormNoPasswordShortUsername" style="width:400px; height:auto;">
 </div>
 
 
