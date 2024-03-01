@@ -15,41 +15,41 @@ A social media Android mobile application (design inspired by Instagram).
 
 ### Log In to iCook
 <div style="display: flex; justify-content: space-around;">
-  <img src="media/videos/LogInUserSuccess.gif" alt="LogInProcess" style="width:25%; height:auto;">
-  <img src="media/screenshots/LogInFailed.png" alt="LogInFailed" style="width:25%; height:auto;">
+  <img src="media/videos/LogInUserSuccess.gif" alt="LogInProcess" style="width:400px; height:auto;">
+  <img src="media/screenshots/LogInFailed.png" alt="LogInFailed" style="width:400px; height:auto;">
 </div>
 
 ### Update/Customizer your iCook profile
 <div style="display: flex; justify-content: center;">
-  <img src="media/videos/UpdateUserProfile.gif" alt="UpdatYourProfileProcess" style="width:25%; height:auto;">
+  <img src="media/videos/UpdateUserProfile.gif" alt="UpdatYourProfileProcess" style="width:400px; height:auto;">
 </div>
 
 ### Create a new post
-<div style="display: flex; justify-content: space-around; height: 500px; width: auto">
-  <img src="media/videos/CreateANewPost.gif" alt="CreateANewPostProcess">
-  <img src="media/screenshots/NoDescriptionForNewPost.png" alt="NoDescriptionForNewPost">
-  <img src="media/screenshots/NoPictureWasSelectedForNewPost.png" alt="NoPictureWasSelectedForNewPost">
+<div style="display: flex; justify-content: space-around;">
+  <img src="media/videos/CreateANewPost.gif" alt="CreateANewPostProcess" style="width:250px; height:auto;">
+  <img src="media/screenshots/NoDescriptionForNewPost.png" alt="NoDescriptionForNewPost" style="width:250px; height:auto;">
+  <img src="media/screenshots/NoPictureWasSelectedForNewPost.png" alt="NoPictureWasSelectedForNewPost" style="width:250px; height:auto;">
 </div>
 
 
 ### Check out your Feed Posts, Interact with other posts (like and comment)
 <div style="display: flex; justify-content: center;">
-  <img src="media/videos/HomePageReactingToPostsAndWritingComments.gif" alt="HomePageReactingToPostsAndWritingCommentsProcess" style="width:25%; height:auto;">
+  <img src="media/videos/HomePageReactingToPostsAndWritingComments.gif" alt="HomePageReactingToPostsAndWritingCommentsProcess" style="width:400px; height:auto;">
 </div>
 
 ### Visit other user profiles
 <div style="display: flex; justify-content: center;">
-  <img src="media/videos/VisitingAnotherUserProfileAndReactingToPostWritingComments.gif" alt="VisitingAnotherUserProfileAndReactingToPostWritingCommentsProcess" style="width:25%; height:auto;">
+  <img src="media/videos/VisitingAnotherUserProfileAndReactingToPostWritingComments.gif" alt="VisitingAnotherUserProfileAndReactingToPostWritingCommentsProcess" style="width:400px; height:auto;">
 </div>
 
 ### Let's log in as another user (aparedes12), check their profile and reply to comments in their posts
 <div style="display: flex; justify-content: center;">
-  <img src="media/videos/LogInAsAnotherUserAndReplyingToCommentInPost.gif" alt="LogInAsAnotherUserAndReplyingToCommentInPostProcess" style="width:25%; height:auto;">
+  <img src="media/videos/LogInAsAnotherUserAndReplyingToCommentInPost.gif" alt="LogInAsAnotherUserAndReplyingToCommentInPostProcess" style="width:400px; height:auto;">
 </div>
 
 ### Let's log in as another user (aramirez), and check out their feed posts
 <div style="display: flex; justify-content: center;">
-  <img src="media/videos/CheckFeedAndProfile.gif" alt="CheckFeedAndProfileProcess" style="width:25%; height:auto;">
+  <img src="media/videos/CheckFeedAndProfile.gif" alt="CheckFeedAndProfileProcess" style="width:400px; height:auto;">
 </div>
 
 
